@@ -11,7 +11,6 @@ import {
   Users,
   ChevronDown,
   CheckCircle,
-  Star,
   ArrowRight
 } from 'lucide-react'
 import BeforeAfterSlider from '../components/BeforeAfterSlider'

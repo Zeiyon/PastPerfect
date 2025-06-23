@@ -22,7 +22,7 @@ A free, open-source web app for AI-powered image and video upscaling and restora
 
 ```bash
 # Clone and install
-git clone <your-repo>
+git clone https://github.com/Zeiyon/PastPerfect.git
 cd frontend
 npm install
 
@@ -51,25 +51,6 @@ src/
 └── App.tsx             # Main app with routing
 ```
 
-## Features
-
-### Homepage
-- Hero section with before/after slider
-- Interactive image comparison examples
-- How it works guide
-- Feature highlights
-- Customer testimonials
-- FAQ section
-- Donation links
-
-### Upscaler Interface
-- Drag & drop file upload
-- Real-time preview
-- Customizable enhancement settings
-- Advanced options (collapsible)
-- Progress tracking
-- Download enhanced files
-
 ## Customization
 
 ### Colors & Theme
@@ -77,12 +58,6 @@ The app uses a dark theme with orange accents. Main colors:
 - Primary: `orange-500` to `red-500` gradient
 - Background: `slate-900` to `slate-800` gradient
 - Cards: `slate-800` with `slate-700` borders
-
-### Content
-Update text content in:
-- `src/pages/HomePage.tsx` - Landing page copy
-- `src/components/TestimonialsSlider.tsx` - Customer reviews
-- `src/components/Header.tsx` & `Footer.tsx` - Site info
 
 ### Images
 Replace placeholder images in `public/`:
@@ -108,35 +83,3 @@ const handleProcess = async () => {
   setProcessedFile(result.downloadUrl)
 }
 ```
-
-## Deployment
-
-### Vercel (Recommended)
-1. Connect your GitHub repo
-2. Vercel auto-detects Vite config
-3. Deploy with one click
-
-### Other Platforms
-The `dist/` folder contains static files ready for any hosting service.
-
-## Contributing
-
-1. Fork the repo
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a PR
-
-## License
-
-MIT License - feel free to use this for your own projects.
-
-## Support
-
-- **Issues**: Create a GitHub issue
-- **Email**: contact@pastperfect.ai
-- **Donations**: Help keep the servers running
-
----
-
-Built by a solo developer who believes AI should be accessible to everyone. If this helps you, consider supporting the project! 🚀
