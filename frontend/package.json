@@ -18,6 +18,7 @@
     "framer-motion": "^12.18.1",
     "lucide-react": "^0.522.0",
     "react": "^19.1.0",
+    "react-compare-slider": "^3.1.0",
     "react-dom": "^19.1.0",
     "react-dropzone": "^14.3.8",
     "react-router-dom": "^7.6.2",

@@ -58,18 +58,18 @@ const testimonials: Testimonial[] = [
 
 export default function TestimonialsSlider() {
   return (
-    <section className="py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <section className="py-20 bg-gradient-to-br from-background-subtle via-background-card to-background-subtle">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
           >
-            <h2 className="text-4xl font-bold text-slate-100 mb-4">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">
               Loved by Thousands
             </h2>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-700 max-w-2xl mx-auto">
               See what our users are saying about PastPerfect
             </p>
           </motion.div>
@@ -100,24 +100,24 @@ export default function TestimonialsSlider() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="bg-slate-800 rounded-2xl p-6 border border-slate-700 h-full"
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                className="bg-background-card rounded-2xl p-6 border border-slate-200 h-full shadow-card"
               >
                 <div className="flex items-center mb-4">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-100">{testimonial.name}</h3>
-                    <p className="text-sm text-slate-400">{testimonial.role} at {testimonial.company}</p>
+                    <h3 className="font-semibold text-slate-900">{testimonial.name}</h3>
+                    <p className="text-sm text-slate-500">{testimonial.role} at {testimonial.company}</p>
                   </div>
                   <div className="flex items-center space-x-1">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} size={16} className="text-orange-400 fill-current" />
+                      <Star key={i} size={16} className="text-primary fill-current" />
                     ))}
                   </div>
                 </div>
                 
                 <div className="relative">
-                  <Quote className="absolute -top-2 -left-2 text-orange-500/20 w-8 h-8" />
-                  <p className="text-slate-300 leading-relaxed pl-6">
+                  <Quote className="absolute -top-2 -left-2 text-primary/20 w-8 h-8" />
+                  <p className="text-slate-700 leading-relaxed pl-6">
                     "{testimonial.content}"
                   </p>
                 </div>

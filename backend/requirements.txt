@@ -1,2 +1,6 @@
 fastapi
-uvicorn 
+uvicorn
+opencv-python
+numpy
+replicate
+python-multipart

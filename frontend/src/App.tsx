@@ -3,7 +3,7 @@ import HomePage from './pages/HomePage'
 import UpscalerPage from './pages/UpscalerPage'
 import Layout from './components/Layout'
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Layout>
@@ -15,5 +15,3 @@ function App() {
     </Router>
   )
 }
-
-export default App

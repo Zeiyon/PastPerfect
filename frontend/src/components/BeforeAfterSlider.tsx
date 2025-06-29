@@ -58,12 +58,12 @@ export default function BeforeAfterSlider({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-700"
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
+      className="bg-background-card rounded-2xl shadow-card overflow-hidden border border-slate-200"
     >
       <div className="p-6">
-        <h3 className="text-xl font-semibold text-slate-100 mb-2">{title}</h3>
-        <p className="text-slate-300 mb-4">{description}</p>
+        <h3 className="text-xl font-semibold text-slate-900 mb-2">{title}</h3>
+        <p className="text-slate-700 mb-4">{description}</p>
       </div>
       
       <div 
@@ -124,8 +124,8 @@ export default function BeforeAfterSlider({
         </div>
       </div>
       
-      <div className="p-4 bg-slate-700 text-center">
-        <p className="text-sm text-slate-300">
+      <div className="p-4 bg-background-subtle text-center">
+        <p className="text-sm text-slate-700">
           Drag the slider to compare • {Math.round(sliderPosition)}% enhanced
         </p>
       </div>

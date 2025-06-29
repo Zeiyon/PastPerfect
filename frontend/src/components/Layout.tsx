@@ -8,14 +8,11 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       <Header />
-      
-      {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 flex flex-col justify-center w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {children}
       </main>
-      
       <Footer />
     </div>
   )
