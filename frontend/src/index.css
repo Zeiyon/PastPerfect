@@ -9,6 +9,7 @@ html, body {
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
   min-height: 100%;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 * {
@@ -83,4 +84,58 @@ html, body {
 
 button, input, select, textarea {
   font-family: inherit;
+}
+
+/* --- Animated Hue Background Blob (Refined) --- */
+body, .home-page {
+    background: #fff !important;
+    min-height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+.blob-outer-container {
+    position: absolute;
+    top: 0;
+    margin-top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2000px;
+    height: 1500px;
+    z-index: 0;
+    filter: blur(90px);
+    opacity: 0.2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.blob-inner-container {
+    border-radius: 30px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: none;
+    transform: scale(1);
+    position: relative;
+}
+
+.blob {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: conic-gradient(from 0deg, #fc8200, #ff4400);
+    animation: spinBlob 5s linear infinite;
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 15%, rgba(0,0,0,0) 100%);
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 15%, rgba(0,0,0,0) 100%);
+}
+
+@keyframes spinBlob {
+    0% {
+        transform: rotate(0deg) scale(1.5);
+    }
+    100% {
+        transform: rotate(1turn) scale(1.5);
+    }
 }

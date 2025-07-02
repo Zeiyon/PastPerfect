@@ -1,11 +1,25 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Github, Mail } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
-export default function Header() {
+interface HeaderProps {
+  onLoginClick?: () => void;
+  onSignUpClick?: () => void;
+}
+
+export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
   const location = useLocation()
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 100)
+    }
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <header className="bg-white shadow-sm border-b border-slate-100 sticky top-0 z-50">
+    <header className={`fixed top-0 left-0 w-full bg-transparent backdrop-blur-md z-50 transition-all ${scrolled ? 'shadow-md' : ''}`}>
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center space-x-3">
@@ -37,22 +51,20 @@ export default function Header() {
             </Link>
           </nav>
           <div className="flex items-center space-x-4">
-            <a 
-              href="https://github.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-slate-400 hover:text-orange-600 transition-colors"
-              aria-label="GitHub"
+            <button
+              type="button"
+              onClick={onLoginClick}
+              className="cursor-pointer px-4 py-1 rounded-full font-semibold text-orange-600 border-1 border-orange-400 bg-white hover:border-orange-600 hover:shadow-md transition-all shadow-sm"
             >
-              <Github size={22} />
-            </a>
-            <a 
-              href="mailto:contact@pastperfect.ai" 
-              className="text-slate-400 hover:text-orange-600 transition-colors"
-              aria-label="Email"
+              Log In
+            </button>
+            <button
+              type="button"
+              onClick={onSignUpClick}
+              className="cursor-pointer px-4 py-1 rounded-full font-semibold text-white bg-gradient-to-r border-1 border-orange-400 from-orange-400 to-orange-600 shadow hover:border-orange-600 hover:shadow-md transition-all"
             >
-              <Mail size={22} />
-            </a>
+              Sign Up
+            </button>
           </div>
         </div>
       </div>
