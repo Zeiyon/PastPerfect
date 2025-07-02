@@ -17,7 +17,7 @@ export default function Layout({ children }: LayoutProps) {
         onLoginClick={() => { setAuthMode('signin'); setAuthOpen(true); }}
         onSignUpClick={() => { setAuthMode('signup'); setAuthOpen(true); }}
       />
-      <main className="max-w-7xl sm:px-6 lg:px-8">
+      <main className="w-full flex-1">
         {children}
       </main>
       <Footer />

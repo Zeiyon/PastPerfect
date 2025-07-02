@@ -22,50 +22,80 @@ export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
     <header className={`fixed top-0 left-0 w-full bg-transparent backdrop-blur-md z-50 transition-all ${scrolled ? 'shadow-md' : ''}`}>
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         <div className="flex justify-between items-center h-20">
+
+          {/* Logo Section */}
           <Link to="/" className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center shadow-md">
               <span className="text-white font-extrabold text-lg tracking-tight">PP</span>
             </div>
             <span className="text-2xl font-extrabold text-slate-900 tracking-tight">PastPerfect</span>
           </Link>
-          <nav className="hidden md:flex space-x-10">
+
+          {/* Center Navigation */}
+          <nav className="hidden md:flex space-x-6">
             <Link 
               to="/" 
-              className={`text-base font-semibold transition-colors px-2 py-1 rounded-md ${
+              className={`text-base font-semibold transition-colors ${
                 location.pathname === '/' 
-                  ? 'text-orange-600 bg-orange-50' 
-                  : 'text-slate-700 hover:text-orange-600 hover:bg-orange-50'
+                  ? 'text-orange-600' 
+                  : 'text-slate-700 hover:text-orange-600'
               }`}
             >
               Home
             </Link>
             <Link 
-              to="/upscaler" 
-              className={`text-base font-semibold transition-colors px-2 py-1 rounded-md ${
-                location.pathname === '/upscaler' 
-                  ? 'text-orange-600 bg-orange-50' 
-                  : 'text-slate-700 hover:text-orange-600 hover:bg-orange-50'
+              to="/restorer" 
+              className={`text-base font-semibold transition-colors ${
+                location.pathname === '/restore' 
+                  ? 'text-orange-600' 
+                  : 'text-slate-700 hover:text-orange-600'
               }`}
             >
-              Upscaler
+              Restore
+            </Link>
+            <Link 
+              to="/upscaler" 
+              className={`text-base font-semibold transition-colors ${
+                location.pathname === '/upscale' 
+                  ? 'text-orange-600' 
+                  : 'text-slate-700 hover:text-orange-600'
+              }`}
+            >
+              <span className="flex items-center">
+                Upscale
+                <span className="px-1 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-600 align-middle transform translate-y-3 -translate-x-1">Free</span>
+              </span>
+            </Link>
+            <Link 
+              to="/pricing" 
+              className={`text-base font-semibold transition-colors ${
+                location.pathname === '/pricing' 
+                  ? 'text-orange-600' 
+                  : 'text-slate-700 hover:text-orange-600'
+              }`}
+            >
+              Pricing
             </Link>
           </nav>
+
+          {/* Auth Buttons (Right Side) */}
           <div className="flex items-center space-x-4">
             <button
               type="button"
               onClick={onLoginClick}
-              className="cursor-pointer px-4 py-1 rounded-full font-semibold text-orange-600 border-1 border-orange-400 bg-white hover:border-orange-600 hover:shadow-md transition-all shadow-sm"
+              className="cursor-pointer px-4 py-1 rounded-xl font-semibold text-orange-600 border-1 border-orange-400 bg-white hover:border-orange-600 hover:shadow-md transition-all shadow-sm"
             >
               Log In
             </button>
             <button
               type="button"
               onClick={onSignUpClick}
-              className="cursor-pointer px-4 py-1 rounded-full font-semibold text-white bg-gradient-to-r border-1 border-orange-400 from-orange-400 to-orange-600 shadow hover:border-orange-600 hover:shadow-md transition-all"
+              className="cursor-pointer px-4 py-1 rounded-xl font-semibold text-white bg-gradient-to-r border-1 border-orange-400 from-orange-400 to-orange-600 shadow hover:border-orange-600 hover:shadow-md transition-all"
             >
               Sign Up
             </button>
           </div>
+
         </div>
       </div>
     </header>

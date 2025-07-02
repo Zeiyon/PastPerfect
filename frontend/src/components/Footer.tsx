@@ -3,7 +3,7 @@ import { Heart } from 'lucide-react'
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-slate-100 mt-24 z-10">
+    <footer className="bg-white border-t border-slate-100 z-10">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="col-span-1 md:col-span-2">

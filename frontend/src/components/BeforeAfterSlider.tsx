@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface BeforeAfterSliderProps {
   beforeImage: string
@@ -107,11 +108,12 @@ export default function BeforeAfterSlider({
         
         {/* Slider Handle */}
         <div 
-          className="absolute top-0 bottom-0 w-1 bg-orange-500 shadow-lg cursor-ew-resize"
+          className="absolute top-0 bottom-0 w-1 bg-orange-500 shadow-lg cursor-ew-resize z-20"
           style={{ left: `${sliderPosition}%` }}
         >
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-orange-500 rounded-full shadow-lg border-2 border-white flex items-center justify-center">
-            <div className="w-2 h-2 bg-white rounded-full"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white border-4 border-orange-500 rounded-full shadow-lg flex items-center justify-center transition-all">
+            <ChevronLeft className="w-5 h-5 text-orange-500 mr-1" />
+            <ChevronRight className="w-5 h-5 text-orange-500 ml-1" />
           </div>
         </div>
         
@@ -122,6 +124,20 @@ export default function BeforeAfterSlider({
         <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-lg text-sm font-medium">
           After
         </div>
+
+        {/* Animated drag indicator at bottom center */}
+        <motion.div
+          className="absolute bottom-2 left-1/2 z-30"
+          style={{ x: '-50%' }}
+          animate={{ x: [ '-50%', 'calc(-50% + 40px)', '-50%', 'calc(-50% - 40px)', '-50%' ] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <div className="flex items-center justify-center bg-white/80 rounded-full px-3 py-1 shadow border border-orange-200">
+            <ChevronLeft className="w-5 h-5 text-orange-400 animate-pulse" />
+            <span className="mx-1 text-orange-500 font-semibold text-xs">Drag</span>
+            <ChevronRight className="w-5 h-5 text-orange-400 animate-pulse" />
+          </div>
+        </motion.div>
       </div>
       
       <div className="p-4 bg-background-subtle text-center">
