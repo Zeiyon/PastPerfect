@@ -10,7 +10,8 @@ export default function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/upscaler" element={<UpscalerPage />} />
+          <Route path="/upscale" element={<UpscalerPage />} />
+          <Route path="/restore" element={<UpscalerPage />} />
           <Route path="/pricing" element={<PricingPage />} />
         </Routes>
       </Layout>

@@ -9,6 +9,7 @@ import { useEffect, useState, useRef } from "react";
 import Testimonials from "../components/Testimonials";
 import FeatureSections from "../components/FeatureSections";
 import FAQ from "../components/FAQ";
+import { Typewriter } from 'react-simple-typewriter';
 
 const heroExample = {
   before: "/homepage-before-1.jpg",
@@ -37,41 +38,37 @@ export default function HomePage() {
         </div>
       </div>
       <div className="space-y-24 pb-24 relative z-10">
-        {/* Centered Hero Section */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="flex flex-col items-center justify-center pt-24 px-4"
-        >
-          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4 text-center leading-tight mt-16">
-            Enhance Your
-            <span className="ml-4 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-              Memories
-            </span>
+        {/* Redesigned Hero Section */}
+        <section className="flex flex-col items-center justify-center pt-32 px-4">
+          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4 text-center leading-tight">
+            Reimagine your
           </h1>
-          <p className="text-xl md:text-xl text-slate-600 mb-12 max-w-3xl text-center">
-            Restore and upscale your images and videos with cutting-edge AI.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-8 mb-18 justify-center">
-            <button
-              onClick={() => navigate("/upscaler")}
-              className="cursor-pointer bg-gradient-to-r from-orange-400 to-orange-600 text-white px-7 py-2 rounded-3xl font-bold text-lg shadow-lg sheen"
-              type="button"
-            >
-              Get Started
-            </button>
-            <button
-              onClick={() =>
-                window.scrollTo({ top: window.innerHeight-100, behavior: "smooth" })
-              }
-              className="cursor-pointer border-2 border-orange-400 text-orange-500 px-6 py-3 rounded-3xl font-bold text-lg bg-white hover:bg-orange-50 transition-colors"
-            >
-              Learn More
-            </button>
+          <div className="flex items-center justify-center mb-6 text-center">
+            <span className="text-5xl md:text-6xl font-bold text-center" style={{ letterSpacing: '0.05em' }}>
+              <span className="ml-8 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+                <Typewriter
+                  words={["Memories", "Photos", "Videos", "Selfies", "Scans"]}
+                  loop={0}
+                  cursor
+                  cursorStyle="_"
+                  typeSpeed={50}
+                  deleteSpeed={50}
+                  // delaySpeed={1500}
+                />
+              </span>
+            </span>
           </div>
-          {/* Large Slider Card */}
-          <div className="w-full max-w-5xl mx-auto">
+          <p className="text-xl md:text-xl text-slate-600 mb-8 max-w-2xl text-center">
+            Remote desktop reimagined – a seamless 4K experience at up to 60 frames per second with near-zero latency. Secure, flexible, effortless access to.
+          </p>
+          <button
+            className="cursor-pointer bg-gradient-to-r from-orange-400 to-orange-600 text-white px-7 py-3 rounded-3xl font-bold text-lg shadow-lg sheen mb-12"
+            type="button"
+          >
+            Get Started Now
+          </button>
+          {/* Large Slider Card (restored) */}
+          <div className="w-full max-w-5xl mx-auto mb-8">
             <div className="bg-white rounded-3xl shadow-xl flex items-center justify-center w-full h-[715px] p-2">
               <div className="relative w-full h-[700px] rounded-xl overflow-hidden">
                 <ReactCompareSlider
@@ -119,7 +116,9 @@ export default function HomePage() {
               <ChevronDown className="w-15 h-15 text-orange-500 opacity-80" />
             </motion.div>
           </div>
-        </motion.section>
+          {/* End Slider */}
+        </section>
+        {/* End Hero Section */}
 
         <FeatureSections />
 
