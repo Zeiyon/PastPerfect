@@ -1,4 +1,5 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useDropzone } from 'react-dropzone'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
@@ -41,6 +42,22 @@ export default function UpscalerPage() {
   const [sliderPosition, setSliderPosition] = useState(50)
   const [isDragging, setIsDragging] = useState(false)
   const sliderRef = useRef<HTMLDivElement>(null)
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+
+  // Close lightbox on ESC
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsLightboxOpen(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    // Prevent background scroll
+    document.body.classList.add('overflow-hidden')
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      document.body.classList.remove('overflow-hidden')
+    }
+  }, [isLightboxOpen])
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
@@ -211,11 +228,14 @@ export default function UpscalerPage() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
-                      isDragActive 
-                        ? 'border-orange-500 bg-orange-50' 
-                        : 'border-slate-300 hover:border-orange-400 hover:bg-orange-50'
-                    }`}>
+                    <div
+                      {...getRootProps()}
+                      className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 flex flex-col justify-center items-center`
+                        + (isDragActive
+                          ? ' border-orange-500 bg-orange-50'
+                          : ' border-slate-300 hover:border-orange-400 hover:bg-orange-50')}
+                      style={{ minHeight: 260, height: 260 }}
+                    >
                       <input {...getInputProps()} />
                       <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
                       <p className="text-lg font-medium text-slate-700 mb-2">
@@ -250,55 +270,57 @@ export default function UpscalerPage() {
                       </div>
                       <button
                         onClick={removeFile}
-                        className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                        className="cursor-pointer p-2 hover:bg-slate-100 rounded-lg transition-colors"
                       >
                         <X className="w-4 h-4 text-slate-500" />
                       </button>
                     </div>
-                    <div className="relative overflow-hidden rounded-lg shadow-md">
-                      {uploadedFile.type === 'image' ? (
-                        <img 
-                          src={uploadedFile.preview} 
-                          alt="Preview" 
-                          className="w-full h-48 object-cover" 
-                        />
-                      ) : (
-                        <video 
-                          src={uploadedFile.preview} 
-                          controls 
-                          className="w-full h-48 object-cover" 
-                        />
-                      )}
-                    </div>
+                   <div
+                     className="relative overflow-hidden rounded-lg shadow-md flex items-center justify-center"
+                     style={{ minHeight: 260, height: 260 }}
+                   >
+                     {uploadedFile.type === 'image' ? (
+                       <img
+                         src={uploadedFile.preview}
+                         alt="Preview"
+                         className="max-h-full max-w-full object-contain"
+                         style={{ height: '100%', width: '100%' }}
+                       />
+                     ) : (
+                       <video
+                         src={uploadedFile.preview}
+                         controls
+                         className="max-h-full max-w-full object-contain"
+                         style={{ height: '100%', width: '100%' }}
+                       />
+                     )}
+                   </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
             {/* Settings */}
-            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
-              <h2 className="text-xl font-semibold text-slate-800 mb-6 flex items-center">
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mt-6">
+              <h2 className="text-xl font-semibold text-slate-800 mb-6 flex items-center relative group">
                 <Settings className="w-5 h-5 mr-2 text-orange-500" />
                 Enhancement Settings
+                <span className="ml-2 relative group">
+                  <Info className="w-4 h-4 text-slate-400 cursor-help" />
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-20 pointer-events-none">
+                    Choose between increasing resolution or improving overall quality
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-800"></div>
+                  </div>
+                </span>
               </h2>
               
               <div className="space-y-6">
                 {/* Enhancement Type */}
                 <div>
-                  <label className="block text-base font-medium text-slate-700 mb-4 flex items-center">
-                    Enhancement Type
-                    <div className="ml-2 relative group">
-                      <Info className="w-4 h-4 text-slate-400 cursor-help" />
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-20 pointer-events-none">
-                        Choose between increasing resolution or improving overall quality
-                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-800"></div>
-                      </div>
-                    </div>
-                  </label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => setSettings(prev => ({ ...prev, enhancementType: 'upscale' }))}
-                      className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                      className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-200 ${
                         settings.enhancementType === 'upscale'
                           ? 'border-orange-500 bg-orange-50 text-orange-700'
                           : 'border-slate-200 hover:border-slate-300'
@@ -312,7 +334,7 @@ export default function UpscalerPage() {
                     </button>
                     <button
                       onClick={() => setSettings(prev => ({ ...prev, enhancementType: 'enhance' }))}
-                      className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                      className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-200 ${
                         settings.enhancementType === 'enhance'
                           ? 'border-orange-500 bg-orange-50 text-orange-700'
                           : 'border-slate-200 hover:border-slate-300'
@@ -346,7 +368,7 @@ export default function UpscalerPage() {
                         <button
                           key={factor}
                           onClick={() => setSettings(prev => ({ ...prev, upscaleFactor: factor }))}
-                          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                          className={`cursor-pointer px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                             settings.upscaleFactor === factor
                               ? 'bg-orange-500 text-white shadow-md'
                               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -399,7 +421,7 @@ export default function UpscalerPage() {
                 <button
                   onClick={handleProcess}
                   disabled={!uploadedFile || isProcessing}
-                  className="w-full bg-gradient-to-r from-orange-400 to-orange-600 text-white py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3"
+                  className="cursor-pointer w-full bg-gradient-to-r from-orange-400 to-orange-600 text-white py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3"
                 >
                   {isProcessing ? (
                     <>
@@ -449,33 +471,40 @@ export default function UpscalerPage() {
                   transition={{ duration: 0.3 }}
                   className="space-y-4"
                 >
-                  {/* Before/After Slider */}
-                  <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-md">
-                    <ReactCompareSlider
-                      itemOne={
-                        <ReactCompareSliderImage
-                          src={uploadedFile.preview}
-                          alt="Original"
-                          style={{ borderRadius: '0.75rem' }}
-                        />
-                      }
-                      itemTwo={
-                        <ReactCompareSliderImage
-                          src={processedFile}
-                          alt="Enhanced"
-                          style={{ borderRadius: '0.75rem' }}
-                        />
-                      }
-                      style={{ width: '100%', height: '100%', borderRadius: '0.75rem' }}
-                      handle={<div className="custom-slider-handle" />}
+                  {/* Enhanced Image Large Display */}
+                  <div className="relative w-full max-h-[410px] h-auto rounded-lg overflow-hidden shadow-md flex items-center justify-center">
+                    <img
+                      src={processedFile}
+                      alt="Enhanced"
+                      className="w-full h-auto object-contain rounded-lg select-none cursor-zoom-in"
+                      style={{ maxHeight: '410px', maxWidth: '100%' }}
+                      onClick={() => setIsLightboxOpen(true)}
                     />
-                    {/* Before/After Labels */}
-                    <span className="absolute left-4 top-4 bg-black/60 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none">
-                      Before
-                    </span>
-                    <span className="absolute right-4 top-4 bg-black/60 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none">
-                      After
-                    </span>
+                    {/* Lightbox Modal (Portal) */}
+                    {isLightboxOpen && typeof window !== 'undefined' && createPortal(
+                      <div
+                        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90"
+                        onClick={() => setIsLightboxOpen(false)}
+                        style={{ cursor: 'zoom-out' }}
+                      >
+                        <button
+                          onClick={() => setIsLightboxOpen(false)}
+                          className="absolute top-6 right-8 text-white text-3xl font-bold bg-black/40 rounded-full w-12 h-12 flex items-center justify-center hover:bg-black/70 transition z-[10000]"
+                          style={{ cursor: 'pointer' }}
+                          aria-label="Close"
+                        >
+                          &times;
+                        </button>
+                        <img
+                          src={processedFile}
+                          alt="Enhanced Fullscreen"
+                          className="max-w-[90vw] max-h-[90vh] rounded-xl shadow-2xl border-4 border-white"
+                          style={{ margin: 32, background: 'white', cursor: 'auto' }}
+                          onClick={e => e.stopPropagation()}
+                        />
+                      </div>,
+                      document.body
+                    )}
                   </div>
 
                   {/* File Information */}
@@ -499,13 +528,62 @@ export default function UpscalerPage() {
                       </div>
                     </div>
                   </div>
-                  
+                  {/* Modern Download Button */}
                   <button
                     onClick={handleDownload}
-                    className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center space-x-3"
+                    className="cursor-pointer w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-sm border border-green-700/10 focus:outline-none focus:ring-2 focus:ring-green-400"
                   >
                     <Download className="w-5 h-5" />
-                    <span>Download Enhanced Image</span>
+                    Download Enhanced Image
+                  </button>
+                  {/* Modern Social Buttons */}
+                  <div className="flex flex-wrap gap-2 w-full justify-center items-center mt-2">
+                    {/* X (Twitter) */}
+                    <a
+                      href={`https://twitter.com/intent/tweet?text=Check%20out%20my%20AI-enhanced%20photo%20from%20PastPerfect!&url=${encodeURIComponent(window.location.href)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center px-3 py-2 bg-[#1da1f2] hover:bg-[#1877c9] text-white rounded-lg font-medium transition-all duration-200 gap-2 shadow-sm"
+                    >
+                      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M22.46 5.924c-.793.352-1.645.59-2.54.698a4.48 4.48 0 0 0 1.963-2.475 8.94 8.94 0 0 1-2.828 1.082A4.48 4.48 0 0 0 16.11 4c-2.48 0-4.49 2.01-4.49 4.49 0 .352.04.695.116 1.022C7.728 9.37 4.1 7.6 1.67 4.905a4.48 4.48 0 0 0-.607 2.26c0 1.56.795 2.94 2.01 3.75a4.48 4.48 0 0 1-2.034-.563v.057c0 2.18 1.55 4 3.6 4.42-.377.104-.775.16-1.185.16-.29 0-.57-.028-.845-.08.57 1.78 2.23 3.08 4.2 3.12A8.98 8.98 0 0 1 2 19.54a12.7 12.7 0 0 0 6.88 2.02c8.26 0 12.78-6.84 12.78-12.78 0-.195-.004-.39-.013-.583A9.14 9.14 0 0 0 24 4.59a8.98 8.98 0 0 1-2.54.697z"/></svg>
+                      X
+                    </a>
+                    {/* Instagram */}
+                    <a
+                      href="https://www.instagram.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center px-3 py-2 bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white rounded-lg font-medium transition-all duration-200 gap-2 shadow-sm"
+                    >
+                      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5zm4.25 2.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm5.25 1.25a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>
+                      Instagram
+                    </a>
+                    {/* Facebook */}
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center px-3 py-2 bg-[#4267B2] hover:bg-[#365899] text-white rounded-lg font-medium transition-all duration-200 gap-2 shadow-sm"
+                    >
+                      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.408.595 24 1.325 24h11.495v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.406 24 24 23.408 24 22.674V1.326C24 .592 23.406 0 22.675 0"/></svg>
+                      Facebook
+                    </a>
+                    {/* Copy Link */}
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(window.location.href)
+                      }}
+                      className="cursor-pointer flex items-center px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-medium transition-all duration-200 gap-2 shadow-sm"
+                    >
+                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 1 7 7l-3 3a5 5 0 0 1-7-7l1-1"/><path d="M14 11a5 5 0 0 0-7-7l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+                      Copy Link
+                    </button>
+                  </div>
+                  <button
+                    onClick={removeFile}
+                    className="cursor-pointer w-full mt-6 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl font-semibold text-base border border-slate-300 transition-all duration-200"
+                  >
+                    Enhance another image
                   </button>
                 </motion.div>
               ) : (
@@ -527,155 +605,124 @@ export default function UpscalerPage() {
           </motion.div>
         </div>
       </div>
-              {/* Modern Info Section */}
-        <section className="max-w-7xl mx-auto w-full mt-20 mb-24 px-4 bg-white shadow-lg rounded-2xl relative z-10" aria-label="AI Image Upscaling Info">
-        {/* SEO Meta Description */}
-        <meta name="description" content="Upscale your images up to 4x with advanced AI. 100% free, private, and secure. Supports large images, bulk upscaling, and transparent images. No sign-up required." />
-        {/* Hero/Intro */}
-        <div className="p-10 md:p-14 mb-14 flex flex-col items-center text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-100">
-              <Sparkles className="w-7 h-7 text-orange-500" />
-            </span>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900">AI Image Upscaling</h1>
-          </div>
-          <p className="text-lg text-slate-700 max-w-2xl mx-auto mb-2 font-medium">
-            Upscale your images up to <b>4x</b> with advanced AI. Private, secure, and free for small-scale use.
-          </p>
-          <div className="mt-2 text-slate-500 text-sm max-w-xl mx-auto">
-            <span>Images up to <b>16MP</b> (max 16,000 × 16,000 px). No sign-up required. Images deleted after processing for your privacy.</span>
-          </div>
-        </div>
 
-        {/* Features as Icon Cards */}
-        <section className="mb-16" aria-labelledby="features-heading">
-          <h2 id="features-heading" className="text-2xl font-bold text-slate-800 mb-8 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-orange-500" /> Key Features
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center text-center bg-white rounded-2xl p-7 shadow border border-slate-100">
-              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 mb-3">
-                <Sparkles className="w-7 h-7 text-orange-500" />
-              </span>
-              <h3 className="font-semibold text-slate-900 mb-1 text-lg">Top Quality Results</h3>
-              <p className="text-slate-600 text-sm">Best for art, anime, and illustrations (except faces)</p>
-            </div>
-            <div className="flex flex-col items-center text-center bg-white rounded-2xl p-7 shadow border border-slate-100">
-              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-100 mb-3">
-                <Check className="w-7 h-7 text-green-500" />
-              </span>
-              <h3 className="font-semibold text-slate-900 mb-1 text-lg">100% Free</h3>
-              <p className="text-slate-600 text-sm">No paywall, no sign-up. Daily free quota applies.</p>
-            </div>
-            <div className="flex flex-col items-center text-center bg-white rounded-2xl p-7 shadow border border-slate-100">
-              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-100 mb-3">
-                <Download className="w-7 h-7 text-blue-500" />
-              </span>
-              <h3 className="font-semibold text-slate-900 mb-1 text-lg">Bulk & Large Images</h3>
-              <p className="text-slate-600 text-sm">Supports up to 4096×4096, transparent images, and bulk upscaling.</p>
-            </div>
-            <div className="flex flex-col items-center text-center bg-white rounded-2xl p-7 shadow border border-slate-100">
-              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-purple-100 mb-3">
-                <Monitor className="w-7 h-7 text-purple-500" />
-              </span>
-              <h3 className="font-semibold text-slate-900 mb-1 text-lg">API & Android</h3>
-              <p className="text-slate-600 text-sm">API available (see PyPI), and Android APK download.</p>
-            </div>
-            <div className="flex flex-col items-center text-center bg-white rounded-2xl p-7 shadow border border-slate-100">
-              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-orange-200 mb-3">
-                <Image className="w-7 h-7 text-orange-500" />
-              </span>
-              <h3 className="font-semibold text-slate-900 mb-1 text-lg">AI 4x Upscale</h3>
-              <p className="text-slate-600 text-sm">Scale images up to 4x with AI. Improve blurred or pixelated faces.</p>
-            </div>
-            <div className="flex flex-col items-center text-center bg-white rounded-2xl p-7 shadow border border-slate-100">
-              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-slate-200 mb-3">
-                <Info className="w-7 h-7 text-slate-500" />
-              </span>
-              <h3 className="font-semibold text-slate-900 mb-1 text-lg">Fast & Friendly</h3>
-              <p className="text-slate-600 text-sm">Modern, easy-to-use interface. Results in minutes.</p>
-            </div>
-          </div>
-        </section>
 
-        {/* Steps as Timeline */}
-        <section className="mb-16" aria-labelledby="how-heading">
-          <h2 id="how-heading" className="text-2xl font-bold text-slate-800 mb-8 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-orange-500" /> How It Works
-          </h2>
-          <ol className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <li className="flex flex-col items-center flex-1 min-w-[160px]">
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl font-bold text-orange-500 mb-2">1</div>
-              <h3 className="font-semibold mb-1 text-slate-800">Upload</h3>
-              <p className="text-slate-600 text-sm text-center">Select an image (max 16MP). For 3x/4x: up to 2MP. For 1x/2x: up to 8MP.</p>
-            </li>
-            <li className="hidden md:block w-10 h-1 bg-slate-200 rounded-full" aria-hidden="true" />
-            <li className="flex flex-col items-center flex-1 min-w-[160px]">
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl font-bold text-orange-500 mb-2">2</div>
-              <h3 className="font-semibold mb-1 text-slate-800">Processing</h3>
-              <p className="text-slate-600 text-sm text-center">AI upscaling starts. Large images may take a few minutes. You can return later.</p>
-            </li>
-            <li className="hidden md:block w-10 h-1 bg-slate-200 rounded-full" aria-hidden="true" />
-            <li className="flex flex-col items-center flex-1 min-w-[160px]">
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl font-bold text-orange-500 mb-2">3</div>
-              <h3 className="font-semibold mb-1 text-slate-800">Download</h3>
-              <p className="text-slate-600 text-sm text-center">Once ready, download your high-res image. Check back in a few minutes if needed.</p>
-            </li>
-            <li className="hidden md:block w-10 h-1 bg-slate-200 rounded-full" aria-hidden="true" />
-            <li className="flex flex-col items-center flex-1 min-w-[160px]">
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl font-bold text-orange-500 mb-2">4</div>
-              <h3 className="font-semibold mb-1 text-slate-800">Cleanup</h3>
-              <p className="text-slate-600 text-sm text-center">Images are deleted a few hours after processing for your privacy.</p>
-            </li>
-          </ol>
-        </section>
 
-        {/* AI vs. Traditional Scaling */}
-        <section className="mb-16" aria-labelledby="ai-vs-traditional-heading">
-          <h2 id="ai-vs-traditional-heading" className="text-2xl font-bold text-slate-800 mb-8 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-orange-500" /> AI Upscaling vs. Traditional Scaling
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 flex flex-col items-center">
-              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 mb-3">
-                <Sparkles className="w-7 h-7 text-orange-500" />
-              </span>
-              <h3 className="font-bold text-orange-600 mb-2 text-lg">AI Upscaling</h3>
-              <ul className="list-disc ml-5 text-slate-700 text-sm text-left">
-                <li>Enhanced detail and vibrancy</li>
-                <li>Preserves original quality</li>
-                <li>Reduces pixelation and blurriness</li>
-              </ul>
-            </div>
-            <div className="bg-white p-8 flex flex-col items-center">
-              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-slate-200 mb-3">
-                <Info className="w-7 h-7 text-slate-500" />
-              </span>
-              <h3 className="font-bold text-slate-600 mb-2 text-lg">Traditional Scaling</h3>
-              <ul className="list-disc ml-5 text-slate-700 text-sm text-left">
-                <li>Loss of detail, blurry results</li>
-                <li>Can’t add new details</li>
-                <li>Limited quality improvement</li>
-              </ul>
-            </div>
-          </div>
-        </section>
 
-        {/* Data Safety & Copyright */}
-        <section className="p-8 flex flex-col items-center text-center" aria-labelledby="data-safety-heading">
-          <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-200 mb-3">
-            <Info className="w-7 h-7 text-slate-500" />
-          </span>
-          <h2 id="data-safety-heading" className="text-xl font-bold text-slate-800 mb-2">Data Safety & Copyright</h2>
-          <ul className="list-disc ml-5 text-slate-700 text-sm text-left max-w-lg mx-auto">
-            <li>Your images are private and matched to you with a secure cookie.</li>
-            <li>Images are deleted a few hours after processing.</li>
-            <li>We never use your images for any purpose except upscaling.</li>
-            <li>You retain full copyright over your images.</li>
-            <li>Images are stored securely and temporarily on our server.</li>
-          </ul>
-        </section>
-      </section>
+        <section className="max-w-7xl mx-auto w-full mt-20 mb-24 px-4 relative z-10 space-y-24">
+
+  {/* Why our AI is unique */}
+  <div className="text-center max-w-3xl mx-auto">
+    <h2 className="text-3xl font-bold text-slate-900 mb-4 flex justify-center items-center gap-2">
+      <Sparkles className="w-6 h-6 text-orange-500" />
+      Why Our AI Stands Out
+    </h2>
+    <p className="text-lg text-slate-600">
+      Unlike typical upscalers trained on art or anime, our models are fine-tuned on thousands of real-world photo pairs — DSLR vs old phone captures — so your memories look sharp and authentic, not artificially smoothed.
+    </p>
+  </div>
+
+  <div className="grid md:grid-cols-3 gap-8 text-center">
+    <div className="flex flex-col items-center bg-white rounded-2xl shadow border border-slate-100 p-8">
+      <Sparkles className="w-8 h-8 mb-4 text-orange-500" />
+      <h3 className="font-semibold text-slate-800 mb-2 text-lg">Custom Fine-Tuning</h3>
+      <p className="text-slate-600 text-sm">
+        Built on Real-ESRGAN, specially trained to enhance old mobile photos so they look DSLR-quality.
+      </p>
     </div>
+    <div className="flex flex-col items-center bg-white rounded-2xl shadow border border-slate-100 p-8">
+      <Monitor className="w-8 h-8 mb-4 text-blue-500" />
+      <h3 className="font-semibold text-slate-800 mb-2 text-lg">Intelligent Restoration</h3>
+      <p className="text-slate-600 text-sm">
+        Reconstructs edges, textures and lost details — far beyond simple pixel scaling.
+      </p>
+    </div>
+    <div className="flex flex-col items-center bg-white rounded-2xl shadow border border-slate-100 p-8">
+      <Check className="w-8 h-8 mb-4 text-green-500" />
+      <h3 className="font-semibold text-slate-800 mb-2 text-lg">Private & Secure</h3>
+      <p className="text-slate-600 text-sm">
+        Processed images auto-delete after processing. You keep full copyright.
+      </p>
+    </div>
+  </div>
+
+  {/* Example transformations */}
+  <div className="text-center max-w-4xl mx-auto space-y-8">
+    <h2 className="text-3xl font-bold text-slate-900 mb-4 flex justify-center items-center gap-2">
+      <Sparkles className="w-6 h-6 text-orange-500" />
+      Example Transformations
+    </h2>
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {[1,2,3,4,5,6].map((i) => (
+        <div key={i} className="relative group">
+          <img src={`/examples/before-${i}.jpg`} alt="Before example" className="rounded-xl shadow group-hover:opacity-0 transition duration-300" />
+          <img src={`/examples/after-${i}.jpg`} alt="After example" className="rounded-xl shadow absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300" />
+          <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs rounded px-2 py-1 pointer-events-none">Hover to see result</div>
+        </div>
+      ))}
+    </div>
+    <p className="text-sm text-slate-500">Hover over any photo to see how our AI restores it to DSLR-like clarity.</p>
+  </div>
+
+  {/* How it works */}
+  <div className="max-w-4xl mx-auto text-center">
+    <h2 className="text-3xl font-bold text-slate-900 mb-6 flex justify-center items-center gap-2">
+      <Sparkles className="w-6 h-6 text-orange-500" />
+      How It Works
+    </h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="flex flex-col items-center">
+        <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl font-bold text-orange-500 mb-2">1</div>
+        <h4 className="font-semibold mb-1 text-slate-800">Upload</h4>
+        <p className="text-slate-600 text-sm">Pick your old phone photo (JPG, PNG, WEBP).</p>
+      </div>
+      <div className="flex flex-col items-center">
+        <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl font-bold text-orange-500 mb-2">2</div>
+        <h4 className="font-semibold mb-1 text-slate-800">Adjust</h4>
+        <p className="text-slate-600 text-sm">Choose upscale level & enable face enhancement if needed.</p>
+      </div>
+      <div className="flex flex-col items-center">
+        <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl font-bold text-orange-500 mb-2">3</div>
+        <h4 className="font-semibold mb-1 text-slate-800">Process</h4>
+        <p className="text-slate-600 text-sm">Our AI rebuilds textures and details in seconds.</p>
+      </div>
+      <div className="flex flex-col items-center">
+        <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl font-bold text-orange-500 mb-2">4</div>
+        <h4 className="font-semibold mb-1 text-slate-800">Download</h4>
+        <p className="text-slate-600 text-sm">Save your enhanced high-res image securely.</p>
+      </div>
+    </div>
+  </div>
+
+  {/* Mini FAQ */}
+  <div className="max-w-3xl mx-auto space-y-8 text-center">
+    <h2 className="text-3xl font-bold text-slate-900 mb-4 flex justify-center items-center gap-2">
+      <Sparkles className="w-6 h-6 text-orange-500" />
+      FAQs
+    </h2>
+    <div className="space-y-4">
+      <div>
+        <h4 className="font-semibold text-slate-800">Is this really free?</h4>
+        <p className="text-slate-600 text-sm">Yes — you can upscale photos for free up to your daily quota. No signup needed.</p>
+      </div>
+      <div>
+        <h4 className="font-semibold text-slate-800">Will my images be stored?</h4>
+        <p className="text-slate-600 text-sm">Images are processed, matched securely to your session, and auto-deleted shortly after.</p>
+      </div>
+      <div>
+        <h4 className="font-semibold text-slate-800">What’s different about your AI?</h4>
+        <p className="text-slate-600 text-sm">We’ve fine-tuned Real-ESRGAN on DSLR vs old phone photos specifically — most tools use models trained on art or anime.</p>
+      </div>
+    </div>
+  </div>
+
+  {/* Privacy trust */}
+  <div className="text-center max-w-3xl mx-auto mt-12">
+    <p className="text-slate-500 text-sm">
+      Your privacy matters. We process your images securely, never train on your data, and automatically delete everything after you’re done. You remain the full copyright holder, always.
+    </p>
+  </div>
+</section>
+  </div>
   )
 } 
