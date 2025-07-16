@@ -2,35 +2,16 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ArrowRight } from "lucide-react";
 
-const faqs = [
-  {
-    question: "What types of damage can PastPerfect restore?",
-    answer:
-      "PastPerfect can repair tears, scratches, water stains, fading, and even colorize black & white photos. Our AI is trained to handle a wide range of photo and video imperfections.",
-  },
-  {
-    question: "Is there a limit to the number of files I can enhance?",
-    answer:
-      "No limits! You can upload and enhance as many images or videos as you like, completely free.",
-  },
-  {
-    question: "How long does the restoration process take?",
-    answer:
-      "Most photos are restored in just a few seconds. Videos may take a bit longer depending on length and quality, but our AI is optimized for speed.",
-  },
-  {
-    question: "Will my original files be safe and private?",
-    answer:
-      "Absolutely. Your uploads are processed securely and never shared. We respect your privacy and memories.",
-  },
-  {
-    question: "Can I adjust the restoration settings?",
-    answer:
-      "Yes! You can fine-tune enhancement strength, style, and more for a personalized result.",
-  },
-];
+interface FAQItem {
+  question: string;
+  answer: string;
+}
 
-const FAQ: React.FC = () => {
+interface FAQProps {
+  faqs?: FAQItem[];
+}
+
+const FAQ: React.FC<FAQProps> = ({ faqs = [] }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (

@@ -103,6 +103,29 @@ const comparisonFeatures = [
   },
 ];
 
+const pricingFaqs = [
+  {
+    question: "Is there a free plan?",
+    answer: "Yes! Our free plan lets you restore basic photos and videos at standard resolution, forever. No credit card required.",
+  },
+  {
+    question: "What do I get with the Monthly plan?",
+    answer: "Unlimited high-res restorations, priority processing, early access to new features, and dedicated support.",
+  },
+  {
+    question: "What is the 25 Images plan?",
+    answer: "A one-time purchase to restore up to 25 photos with high-res downloads and priority processing—no subscription needed.",
+  },
+  {
+    question: "Can I cancel or change my plan anytime?",
+    answer: "Yes, you can cancel or switch plans at any time. The monthly plan has a 7-day money-back guarantee.",
+  },
+  {
+    question: "Do you offer refunds?",
+    answer: "We offer a 7-day money-back guarantee on the monthly plan. For one-time purchases, contact support if you have any issues.",
+  },
+];
+
 export default function PricingPage() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -206,7 +229,7 @@ export default function PricingPage() {
 
         {/* FAQ Section */}
         <div className="w-full max-w-6xl mx-auto mt-10">
-          <FAQ />
+          <FAQ faqs={pricingFaqs} />
         </div>
       </div>
     </div>
