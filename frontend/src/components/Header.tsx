@@ -19,14 +19,18 @@ export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
   }, [])
 
   return (
-    <header className={`fixed top-0 left-0 w-full bg-transparent backdrop-blur-md z-50 transition-all ${scrolled ? 'shadow-md' : ''}`}>
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+    <header className={`fixed top-0 left-0 right-0 container max-w-7xl mx-auto z-50 transition-all duration-800 ${
+      scrolled 
+        ? 'bg-white/50 backdrop-blur-md shadow-lg mt-4 rounded-2xl' 
+        : 'bg-transparent backdrop-blur-md'
+    }`}>
+      <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0">
         <div className="flex justify-between items-center h-20">
 
           {/* Logo Section */}
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-white font-extrabold text-lg tracking-tight">PP</span>
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md">
+              <img src="/logo.png" alt="PastPerfect Logo" className="w-10 h-10 z-10" />
             </div>
             <span className="text-2xl font-extrabold text-slate-900 tracking-tight">PastPerfect</span>
           </Link>
@@ -83,14 +87,14 @@ export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
             <button
               type="button"
               onClick={onLoginClick}
-              className="cursor-pointer px-4 py-1 rounded-xl font-semibold text-orange-600 border-1 border-orange-400 bg-white hover:border-orange-600 hover:shadow-md transition-all shadow-sm"
+              className="cursor-pointer px-4 py-1 rounded-xl font-semibold text-orange-600 border border-orange-400 bg-white hover:border-orange-600 hover:shadow-md transition-all shadow-sm"
             >
               Log In
             </button>
             <button
               type="button"
               onClick={onSignUpClick}
-              className="cursor-pointer px-4 py-1 rounded-xl font-semibold text-white bg-gradient-to-r border-1 border-orange-400 from-orange-400 to-orange-600 shadow hover:border-orange-600 hover:shadow-md transition-all"
+              className="cursor-pointer px-4 py-1 rounded-xl font-semibold text-white bg-gradient-to-r border border-orange-400 from-orange-400 to-orange-600 shadow hover:border-orange-600 hover:shadow-md transition-all"
             >
               Sign Up
             </button>

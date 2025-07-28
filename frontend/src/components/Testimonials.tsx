@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React from 'react';
 
 const testimonials = [
@@ -57,11 +58,17 @@ const col2 = [testimonials[2], testimonials[4], testimonials[5]];
 const col3 = [testimonials[1], testimonials[5], testimonials[0]];
 
 const Testimonials: React.FC = () => (
-  <section className="w-full bg-[#f8fafc] py-20 px-4">
+  <motion.div
+  initial={{ opacity: 0, y: 60 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true, amount: 0.4 }}
+  transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+>
+  <section className="w-full py-20 px-4">
     <h2 className="text-center text-2xl md:text-3xl font-bold text-slate-900 mb-12 tracking-tight">
       See how PastPerfect brings memories back to life
     </h2>
-    <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3">
       {[col1, col2, col3].map((col, idx) => (
         <div
           key={idx}
@@ -72,10 +79,10 @@ const Testimonials: React.FC = () => (
                style={{background: 'linear-gradient(to bottom, #f8fafc 1%, transparent)'}} />
           {/* Bottom Fade */}
           <div className="pointer-events-none absolute bottom-0 left-0 w-full h-10 z-10"
-               style={{background: 'linear-gradient(to top, #f8fafc 1%, transparent)'}} />
+               style={{background: 'linear-gradient(to top, #f8fafc 10%, transparent)'}} />
 
           <div
-            className={`absolute w-full flex flex-col gap-6 animate-${idx === 1 ? 'testimonials-scroll-up' : 'testimonials-scroll-down'}`}
+            className={`absolute px-4 w-full flex flex-col gap-6 animate-${idx === 1 ? 'testimonials-scroll-up' : 'testimonials-scroll-down'}`}
             style={{ animationDuration: '30s', animationTimingFunction: 'linear', animationIterationCount: 'infinite' }}
           >
             {[...col, ...col].map((t, i) => (
@@ -117,6 +124,7 @@ const Testimonials: React.FC = () => (
       }
     `}</style>
   </section>
+  </motion.div>
 );
 
 export default Testimonials; 

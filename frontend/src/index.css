@@ -145,12 +145,66 @@ body, .home-page {
   transform: translateX(-100%) skewX(-20deg);
   transition: none;
   pointer-events: none;
+  animation: sheen-btn-load 2.5s cubic-bezier(0.4,0,0.2,1) 0.5s forwards;
 }
 .sheen-btn:hover::after, .sheen-btn:focus::after {
   animation: sheen-btn-move 1.9s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes sheen-btn-load {
+  0% {
+    transform: translateX(-100%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(120%) skewX(-20deg);
+  }
 }
 @keyframes sheen-btn-move {
   100% {
     transform: translateX(120%) skewX(-20deg);
   }
+}
+
+/* React Compare Slider custom styles */
+[data-rcs] {
+  position: relative;
+}
+
+[data-rcs-handle] {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 100%;
+  background: white;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  cursor: ew-resize;
+}
+
+[data-rcs-handle]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  background: white;
+  border: 2px solid #f97316;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-rcs-handle]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: #f97316;
+  border-radius: 50%;
 }
