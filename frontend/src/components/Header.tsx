@@ -63,7 +63,7 @@ export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
             >
               <span className="flex items-center">
                 Upscale
-                <span className="px-1 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-600 align-middle transform translate-y-3 -translate-x-1">Free</span>
+                <span className="px-1 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-600 align-middle transform translate-y-3 -translate-x-1 rotate-5">Free</span>
               </span>
             </Link>
             <Link 

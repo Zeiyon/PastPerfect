@@ -6,10 +6,11 @@ import {
   ReactCompareSliderImage,
 } from "react-compare-slider";
 import { useEffect, useState, useRef } from "react";
+import { useViewportScroll, useTransform } from "framer-motion";
 import Testimonials from "../components/Testimonials";
 import FeatureSections from "../components/FeatureSections";
 import FAQ from "../components/FAQ";
-import { Typewriter } from 'react-simple-typewriter';
+import { TypeAnimation } from 'react-type-animation';
 
 const faqs = [
   {
@@ -67,90 +68,63 @@ export default function HomePage() {
       </div>
       <div className="space-y-24 pb-24 relative z-10">
         {/* Redesigned Hero Section */}
-        <section className="flex flex-col items-center justify-center pt-32 px-4">
-          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4 text-center leading-tight">
+        <motion.section
+            initial={{ scale: 0.95, opacity: 0, y: 30 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
+          className="flex flex-col items-center justify-center pt-44 pb-44 px-4 min-h-[70vh] bg-gradient-to-b from-white via-slate-50 to-slate-100 relative mb-0"
+        >
+          <h1 className="text-6xl md:text-7xl font-extrabold text-slate-900 mb-10 text-center leading-tight tracking-tight drop-shadow-lg">
             Reimagine your
           </h1>
-          <div className="flex items-center justify-center mb-6 text-center">
-            <span className="text-5xl md:text-6xl font-bold text-center" style={{ letterSpacing: '0.05em' }}>
-              <span className="ml-8 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-                <Typewriter
-                  words={["Memories", "Photos", "Videos", "Selfies", "Scans"]}
-                  loop={0}
-                  cursor
-                  cursorStyle="_"
-                  typeSpeed={50}
-                  deleteSpeed={50}
-                  // delaySpeed={1500}
+          <div className="flex items-center justify-center mb-12 text-center">
+            <span className="text-6xl md:text-7xl font-extrabold text-center tracking-wide" style={{ letterSpacing: '0.05em' }}>
+              <span className="ml-8 text-orange-500 font-extrabold">
+                <TypeAnimation
+                  sequence={[
+                    "Memories",
+                    1000,
+                    "Photos",
+                    1000,
+                    "Videos",
+                    1000,
+                    "Selfies",
+                    1000,
+                    "Scans",
+                    1000,
+                  ]}
+                  wrapper="span"
+                  speed={50}
+                  repeat={Infinity}
+                  preRenderFirstString={true}
+                  cursor={true}
                 />
               </span>
             </span>
           </div>
-          <p className="text-xl md:text-xl text-slate-600 mb-8 max-w-2xl text-center">
-            Remote desktop reimagined – a seamless 4K experience at up to 60 frames per second with near-zero latency. Secure, flexible, effortless access to.
+          <p className="text-2xl md:text-2xl text-slate-700 mb-16 max-w-3xl text-center font-medium">
+            Restore, enhance, and relive your most precious moments with stunning clarity. Fast, secure, and always free.
           </p>
           <button
-            className="cursor-pointer bg-gradient-to-r from-orange-400 to-orange-600 text-white px-7 py-3 rounded-3xl font-bold text-lg shadow-lg sheen mb-12"
+            className="cursor-pointer px-8 py-3 rounded-xl font-bold text-lg shadow-md bg-orange-500 text-white border border-orange-600 relative overflow-hidden mb-24 sheen-btn transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-orange-300 hover:bg-orange-600"
             type="button"
+            onClick={() => navigate('/upscale')}
           >
             Get Started Now
           </button>
           {/* Large Slider Card (restored) */}
-          <div className="w-full max-w-5xl mx-auto mb-8">
-            <div className="bg-white rounded-3xl shadow-xl flex items-center justify-center w-full h-[715px] p-2">
-              <div className="relative w-full h-[700px] rounded-xl overflow-hidden">
-                <ReactCompareSlider
-                  itemOne={
-                    <ReactCompareSliderImage
-                      src={heroExample.before}
-                      alt="Before"
-                      style={{ borderRadius: "1rem" }}
-                    />
-                  }
-                  itemTwo={
-                    <ReactCompareSliderImage
-                      src={heroExample.after}
-                      alt="After"
-                      style={{ borderRadius: "1rem" }}
-                    />
-                  }
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "1rem",
-                  }}
-                  handle={<div className="custom-slider-handle" />}
-                  position={sliderPosition}
-                />
-                {/* Before/After Labels */}
-                <span className="absolute left-4 top-4 bg-black/60 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none">
-                  Before
-                </span>
-                <span className="absolute right-4 top-4 bg-black/60 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none">
-                  After
-                </span>
-              </div>
-            </div>
-            {/* Animated Down Arrow */}
-            <motion.div
-              animate={{ y: [0, 30, 0] }}
-              transition={{
-                repeat: Infinity,
-                duration: 0.75,
-                ease: "easeInOut",
-              }}
-              className="flex justify-center mt-4"
-            >
-              <ChevronDown className="w-15 h-15 text-orange-500 opacity-80" />
-            </motion.div>
-          </div>
+          <HeroSlider sliderPosition={sliderPosition} setSliderPosition={setSliderPosition} heroExample={heroExample} />
           {/* End Slider */}
-        </section>
+        </motion.section>
         {/* End Hero Section */}
-
-        <FeatureSections />
-
-        <div className="my-20"></div>
+        
+        <div
+  style={{
+    background: 'linear-gradient(to bottom, #f1f5f9 0%, #fff 25%, #fff 100%)'
+  }}
+>
+  <FeatureSections />
+</div>
 
         <motion.div
           initial={{ opacity: 0, y: 60 }}
@@ -167,6 +141,77 @@ export default function HomePage() {
         <FAQ faqs={faqs} />
       </div>
     </div>
+  );
+}
+
+// HeroSlider component with scroll-based scaling
+type HeroSliderProps = {
+  sliderPosition: number;
+  setSliderPosition: React.Dispatch<React.SetStateAction<number>>;
+  heroExample: { before: string; after: string };
+};
+function HeroSlider({ sliderPosition, setSliderPosition, heroExample }: HeroSliderProps) {
+  const ref = useRef(null);
+  const { scrollY } = useViewportScroll();
+  // Scale from 1 to 1.18 as you scroll 0 to 400px past the top of the slider
+  const scale = useTransform(scrollY, [0, 400], [1, 1.18]);
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{ scale }}
+      initial={{ scale: 0.95, opacity: 0, y: 30 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+      className="w-full max-w-5xl mx-auto mb-8"
+    >
+      <div className="bg-white rounded-3xl shadow-xl flex items-center justify-center w-full h-[715px] p-2">
+        <div className="relative w-full h-[700px] rounded-xl overflow-hidden">
+          <ReactCompareSlider
+            itemOne={
+              <ReactCompareSliderImage
+                src={heroExample.before}
+                alt="Before"
+                style={{ borderRadius: "1rem" }}
+              />
+            }
+            itemTwo={
+              <ReactCompareSliderImage
+                src={heroExample.after}
+                alt="After"
+                style={{ borderRadius: "1rem" }}
+              />
+            }
+            style={{
+              width: "100%",
+              height: "100%",
+              borderRadius: "1rem",
+            }}
+            handle={<div className="custom-slider-handle" />}
+            position={sliderPosition}
+          />
+          {/* Before/After Labels */}
+          <span className="absolute left-4 top-4 bg-black/60 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none">
+            Before
+          </span>
+          <span className="absolute right-4 top-4 bg-black/60 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none">
+            After
+          </span>
+        </div>
+      </div>
+      {/* Animated Down Arrow */}
+      <motion.div
+        animate={{ y: [0, 30, 0] }}
+        transition={{
+          repeat: Infinity,
+          duration: 0.75,
+          ease: "easeInOut",
+        }}
+        className="flex justify-center mt-4"
+      >
+        <ChevronDown className="w-15 h-15 text-orange-500 opacity-80" />
+      </motion.div>
+    </motion.div>
   );
 }
 

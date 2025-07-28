@@ -16,6 +16,7 @@ import {
   Monitor
 } from 'lucide-react'
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
+import FAQ from '../components/FAQ'
 
 interface UploadedFile {
   file: File
@@ -611,61 +612,78 @@ export default function UpscalerPage() {
 
         <section className="max-w-7xl mx-auto w-full mt-20 mb-24 px-4 relative z-10 space-y-24">
 
-  {/* Why our AI is unique */}
-  <div className="text-center max-w-3xl mx-auto">
+  {/* Why our AI is unique - Replace with larger slider and add feature cards */}
+  <div className="text-center max-w-3xl mx-auto mb-16">
     <h2 className="text-3xl font-bold text-slate-900 mb-4 flex justify-center items-center gap-2">
       <Sparkles className="w-6 h-6 text-orange-500" />
       Why Our AI Stands Out
     </h2>
-    <p className="text-lg text-slate-600">
+    <p className="text-lg text-slate-600 mb-8">
       Unlike typical upscalers trained on art or anime, our models are fine-tuned on thousands of real-world photo pairs — DSLR vs old phone captures — so your memories look sharp and authentic, not artificially smoothed.
     </p>
-  </div>
-
-  <div className="grid md:grid-cols-3 gap-8 text-center">
-    <div className="flex flex-col items-center bg-white rounded-2xl shadow border border-slate-100 p-8">
-      <Sparkles className="w-8 h-8 mb-4 text-orange-500" />
-      <h3 className="font-semibold text-slate-800 mb-2 text-lg">Custom Fine-Tuning</h3>
-      <p className="text-slate-600 text-sm">
-        Built on Real-ESRGAN, specially trained to enhance old mobile photos so they look DSLR-quality.
-      </p>
     </div>
-    <div className="flex flex-col items-center bg-white rounded-2xl shadow border border-slate-100 p-8">
-      <Monitor className="w-8 h-8 mb-4 text-blue-500" />
-      <h3 className="font-semibold text-slate-800 mb-2 text-lg">Intelligent Restoration</h3>
-      <p className="text-slate-600 text-sm">
-        Reconstructs edges, textures and lost details — far beyond simple pixel scaling.
-      </p>
+    {/* Feature Cards Row */}
+    <div className="w-full max-w-5xl mx-auto mt-12 flex flex-col md:flex-row gap-6 justify-center items-stretch">
+      {/* Card 1 */}
+      <div className="flex-1 bg-white rounded-2xl shadow-lg border border-slate-200 p-8 flex flex-col items-center text-center">
+        <span className="mb-4"><Sparkles className="w-10 h-10 text-orange-500" /></span>
+        <h3 className="text-lg font-bold mb-2">Custom Fine-Tuning</h3>
+        <p className="text-slate-600 text-base">Built on Real-ESRGAN, specially trained to enhance old mobile photos so they look DSLR-quality.</p>
+      </div>
+      {/* Card 2 */}
+      <div className="flex-1 bg-white rounded-2xl shadow-lg border border-slate-200 p-8 flex flex-col items-center text-center">
+        <span className="mb-4"><Monitor className="w-10 h-10 text-blue-500" /></span>
+        <h3 className="text-lg font-bold mb-2">Intelligent Restoration</h3>
+        <p className="text-slate-600 text-base">Reconstructs edges, textures and lost details — far beyond simple pixel scaling.</p>
+      </div>
+      {/* Card 3 */}
+      <div className="flex-1 bg-white rounded-2xl shadow-lg border border-slate-200 p-8 flex flex-col items-center text-center">
+        <span className="mb-4"><Check className="w-10 h-10 text-green-500" /></span>
+        <h3 className="text-lg font-bold mb-2">Private & Secure</h3>
+        <p className="text-slate-600 text-base">Processed images auto-delete after processing. You keep full copyright.</p>
+      </div>
     </div>
-    <div className="flex flex-col items-center bg-white rounded-2xl shadow border border-slate-100 p-8">
-      <Check className="w-8 h-8 mb-4 text-green-500" />
-      <h3 className="font-semibold text-slate-800 mb-2 text-lg">Private & Secure</h3>
-      <p className="text-slate-600 text-sm">
-        Processed images auto-delete after processing. You keep full copyright.
-      </p>
-    </div>
-  </div>
-
-  {/* Example transformations */}
-  <div className="text-center max-w-4xl mx-auto space-y-8">
-    <h2 className="text-3xl font-bold text-slate-900 mb-4 flex justify-center items-center gap-2">
-      <Sparkles className="w-6 h-6 text-orange-500" />
-      Example Transformations
-    </h2>
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      {[1,2,3,4,5,6].map((i) => (
-        <div key={i} className="relative group">
-          <img src={`/examples/before-${i}.jpg`} alt="Before example" className="rounded-xl shadow group-hover:opacity-0 transition duration-300" />
-          <img src={`/examples/after-${i}.jpg`} alt="After example" className="rounded-xl shadow absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300" />
-          <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs rounded px-2 py-1 pointer-events-none">Hover to see result</div>
+    {/* Bigger ReactCompareSlider */}
+    <div className="flex flex-col items-center w-full mt-10">
+      <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 text-center">See the Difference</h3>
+      <div className="bg-white rounded-3xl shadow-xl flex items-center justify-center w-full max-w-5xl h-[715px] p-2">
+        <div className="relative w-full h-[700px] rounded-xl overflow-hidden">
+          <ReactCompareSlider
+            itemOne={
+              <ReactCompareSliderImage
+                src="/homepage-before-2.jpg"
+                alt="Before"
+                style={{ borderRadius: "1rem" }}
+              />
+            }
+            itemTwo={
+              <ReactCompareSliderImage
+                src="/homepage-after-2.jpg"
+                alt="After"
+                style={{ borderRadius: "1rem" }}
+              />
+            }
+            style={{
+              width: "100%",
+              height: "100%",
+              borderRadius: "1rem",
+            }}
+            handle={<div className="custom-slider-handle" />}
+            position={sliderPosition}
+          />
+          {/* Before/After Labels */}
+          <span className="absolute left-4 top-4 bg-black/60 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none">
+            Before
+          </span>
+          <span className="absolute right-4 top-4 bg-black/60 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none">
+            After
+          </span>
         </div>
-      ))}
+      </div>
     </div>
-    <p className="text-sm text-slate-500">Hover over any photo to see how our AI restores it to DSLR-like clarity.</p>
-  </div>
 
   {/* How it works */}
-  <div className="max-w-4xl mx-auto text-center">
+  <div className="max-w-4xl mx-auto text-center mb-24">
     <h2 className="text-3xl font-bold text-slate-900 mb-6 flex justify-center items-center gap-2">
       <Sparkles className="w-6 h-6 text-orange-500" />
       How It Works
@@ -694,26 +712,24 @@ export default function UpscalerPage() {
     </div>
   </div>
 
-  {/* Mini FAQ */}
-  <div className="max-w-3xl mx-auto space-y-8 text-center">
-    <h2 className="text-3xl font-bold text-slate-900 mb-4 flex justify-center items-center gap-2">
-      <Sparkles className="w-6 h-6 text-orange-500" />
-      FAQs
-    </h2>
-    <div className="space-y-4">
-      <div>
-        <h4 className="font-semibold text-slate-800">Is this really free?</h4>
-        <p className="text-slate-600 text-sm">Yes — you can upscale photos for free up to your daily quota. No signup needed.</p>
-      </div>
-      <div>
-        <h4 className="font-semibold text-slate-800">Will my images be stored?</h4>
-        <p className="text-slate-600 text-sm">Images are processed, matched securely to your session, and auto-deleted shortly after.</p>
-      </div>
-      <div>
-        <h4 className="font-semibold text-slate-800">What’s different about your AI?</h4>
-        <p className="text-slate-600 text-sm">We’ve fine-tuned Real-ESRGAN on DSLR vs old phone photos specifically — most tools use models trained on art or anime.</p>
-      </div>
-    </div>
+  {/* FAQ Section - Modern, Clean */}
+  <div className="max-w-6xl mx-auto mb-24 px-4">
+    <FAQ
+      faqs={[
+        {
+          question: 'Is this really free?',
+          answer: 'Yes — you can upscale photos for free up to your daily quota. No signup needed.'
+        },
+        {
+          question: 'Will my images be stored?',
+          answer: 'Images are processed, matched securely to your session, and auto-deleted shortly after.'
+        },
+        {
+          question: 'What’s different about your AI?',
+          answer: 'We’ve fine-tuned Real-ESRGAN on DSLR vs old phone photos specifically — most tools use models trained on art or anime.'
+        }
+      ]}
+    />
   </div>
 
   {/* Privacy trust */}

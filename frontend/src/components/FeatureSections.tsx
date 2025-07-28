@@ -15,7 +15,7 @@ const FeatureSections: React.FC = () => (
     <motion.section
       {...sectionMotionProps}
       style={{ boxShadow: '0 6px 24px 0 rgba(11,32,96,.05)' }}
-      className="relative border-1 border-slate-100 flex flex-col md:flex-row items-center justify-between gap-12 max-w-6xl mx-auto bg-white rounded-3xl p-8 md:p-16 my-8 overflow-hidden"
+      className="relative border-1 border-slate-100 flex flex-col md:flex-row items-center justify-between gap-12 max-w-6xl mx-auto bg-white rounded-3xl p-8 md:p-16 overflow-hidden mb-12"
     >
       {/* Left: Interactive Slider */}
       <div className="w-full md:w-1/2 flex justify-center items-center z-10">
@@ -64,7 +64,7 @@ const FeatureSections: React.FC = () => (
     <motion.section
       {...sectionMotionProps}
       style={{ boxShadow: '0 6px 24px 0 rgba(11,32,96,.05)' }}
-      className="relative border-1 border-slate-100 flex flex-col md:flex-row-reverse items-center justify-between gap-12 max-w-6xl mx-auto bg-white rounded-3xl p-8 md:p-16 my-8 overflow-hidden"
+      className="relative border-1 border-slate-100 flex flex-col md:flex-row-reverse items-center justify-between gap-12 max-w-6xl mx-auto bg-white rounded-3xl p-8 md:p-16 overflow-hidden mb-12"
     >
       {/* Sunlight Hue Top Right */}
       <div
@@ -107,7 +107,7 @@ const FeatureSections: React.FC = () => (
     <motion.section
       {...sectionMotionProps}
       style={{ boxShadow: '0 6px 24px 0 rgba(11,32,96,.05)' }}
-      className="relative border-1 border-slate-100 flex flex-col md:flex-row items-center justify-between gap-12 max-w-6xl mx-auto bg-white rounded-3xl p-8 md:p-16 my-8 overflow-hidden"
+      className="relative border-1 border-slate-100 flex flex-col md:flex-row items-center justify-between gap-12 max-w-6xl mx-auto bg-white rounded-3xl p-8 md:p-16 overflow-hidden mb-12"
     >
     {/* Sunlight Hue Top Right */}
     <div
