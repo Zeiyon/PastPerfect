@@ -5,10 +5,12 @@ import RestorePage from './pages/RestorePage'
 import RestoreProcessingPage from './pages/RestoreProcessingPage'
 import Layout from './components/Layout'
 import PricingPage from "./pages/PricingPage";
+import ScrollRestoration from './components/ScrollRestoration'
 
 export default function App() {
   return (
     <Router>
+      <ScrollRestoration />
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />

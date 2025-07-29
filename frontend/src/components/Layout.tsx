@@ -3,6 +3,7 @@ import Header from './Header'
 import Footer from './Footer'
 import { useState } from 'react'
 import AuthModal from './AuthModal'
+import { useScrollToTop } from '../hooks/useScrollToTop'
 
 interface LayoutProps {
   children: ReactNode
@@ -11,6 +12,10 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
+  
+  // Ensure each page starts at the top
+  useScrollToTop()
+  
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Header 
