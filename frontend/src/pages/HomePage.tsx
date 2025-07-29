@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { motion, animate, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
+import { motion, useScroll, useSpring, useMotionValue } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import Testimonials from "../components/Testimonials";
@@ -49,110 +49,71 @@ const heroExample = {
 export default function HomePage() {
   const navigate = useNavigate();
   const sliderRef = useRef<HTMLDivElement>(null);
-  
-  // Enhanced slider position animation with spring physics
-  const [sliderPosition, setSliderPosition] = useState(100); // Start from right (100)
+  const [sliderPosition, setSliderPosition] = useState(100);
   const springPosition = useSpring(100, {
     stiffness: 100,
     damping: 25,
     mass: 1,
   });
-  
-  // Intersection observer for enhanced scroll animations
-  const [sliderInViewRef, sliderInView] = useInView({
+
+  const [sliderInViewRef] = useInView({
     threshold: 0.3,
     triggerOnce: true,
   });
-  
-  // Enhanced scroll-based animations with better ranges and easing
+
   const { scrollY } = useScroll();
-  
-  // Parallax effect: slider stays in place initially, then moves up with scroll
-  const sliderScale = useTransform(
-    scrollY, 
-    [0, 100, 300, 800], 
-    [1, 1, 1, 1.25]
-  );
-  
-  // Stay in place initially, then move down with scroll (parallax effect)
-  const sliderY = useTransform(
-    scrollY, 
-    [0, 300, 1000], 
-    [0, 0, 600]
-  );
-  
-  // Opacity stays high during parallax, then fades when it stops
-  const sliderOpacity = useTransform(
-    scrollY, 
-    [0, 1000, 1200, 1400], 
-    [1, 1, 0.95, 0.9]
-  );
-  
-  // Subtle rotation during parallax
-  const sliderRotate = useTransform(
-    scrollY,
-    [0, 1000],
-    [0, 2]
-  );
-  
-  // Enhanced shadow effect
-  const shadowBlur = useTransform(
-    scrollY,
-    [0, 1000],
-    [15, 25]
-  );
-  
-  // Mouse tracking for subtle interactive effect
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  
-  const handleMouseMove = (event: React.MouseEvent) => {
-    if (sliderRef.current) {
-      const rect = sliderRef.current.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      
-      mouseX.set((event.clientX - centerX) / 80);
-      mouseY.set((event.clientY - centerY) / 80);
-    }
-  };
-  
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
-  
+
+  // Manual motion values for smoother performance
+  const sliderScale = useMotionValue(1);
+  const sliderY = useMotionValue(0);
+  const sliderRotate = useMotionValue(0);
+
   useEffect(() => {
-    // Enhanced animation sequence with better timing
+    const update = () => {
+      const y = scrollY.get();
+
+      // Scale: 1 → 1.25 from y = 300 to y = 800
+      const scale =
+        y < 300 ? 1 : y < 800 ? 1 + (y - 300) / 2000 : 1.25;
+      sliderScale.set(scale);
+
+      // Y translation: 0 → 600 from y = 300 to y = 1000
+      const newY = y < 300 ? 0 : y < 1000 ? ((y - 300) / 700) * 600 : 600;
+      sliderY.set(newY);
+
+      // Rotation: 0 → 2 degrees from y = 0 to y = 1000
+      const rotate = Math.min(y / 500, 2);
+      sliderRotate.set(rotate);
+
+      requestAnimationFrame(update);
+    };
+
+    const frame = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(frame);
+  }, [scrollY]);
+
+  useEffect(() => {
     const sequence = async () => {
-      // Initial delay for content to settle
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
-      // Animate slider position to center (50) with smooth spring animation
+      await new Promise((resolve) => setTimeout(resolve, 1200));
       springPosition.set(50);
-      
-      // Update the slider position state
       const unsubscribe = springPosition.on("change", (latest) => {
         setSliderPosition(latest);
       });
-      
       return unsubscribe;
     };
-    
     sequence();
   }, [springPosition]);
 
   return (
     <div className="relative home-page">
       <div className="space-y-24 pb-24 relative z-10">
-        {/* Redesigned Hero Section */}
         <motion.section
           initial={{ scale: 0.98, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ 
-            duration: 1.2, 
-            delay: 0.1, 
-            ease: [0.25, 0.46, 0.45, 0.94] 
+          transition={{
+            duration: 1.2,
+            delay: 0.1,
+            ease: [0.25, 0.46, 0.45, 0.94],
           }}
           style={{
             background:
@@ -160,26 +121,26 @@ export default function HomePage() {
           }}
           className="hero-background flex flex-col items-center justify-center pt-44 pb-[40rem] px-4 min-h-[70vh] relative mb-0"
         >
-
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.8, 
-              delay: 0.3, 
-              ease: [0.25, 0.46, 0.45, 0.94] 
+            transition={{
+              duration: 0.8,
+              delay: 0.3,
+              ease: [0.25, 0.46, 0.45, 0.94],
             }}
             className="text-6xl md:text-7xl font-extrabold text-slate-900 mb-10 text-center leading-tight tracking-tight drop-shadow-lg"
           >
             Reimagine your
           </motion.h1>
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.8, 
-              delay: 0.5, 
-              ease: [0.25, 0.46, 0.45, 0.94] 
+            transition={{
+              duration: 0.8,
+              delay: 0.5,
+              ease: [0.25, 0.46, 0.45, 0.94],
             }}
             className="flex items-center justify-center mb-12 text-center"
           >
@@ -210,30 +171,32 @@ export default function HomePage() {
               </span>
             </span>
           </motion.div>
-          <motion.p 
+
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.8, 
-              delay: 0.7, 
-              ease: [0.25, 0.46, 0.45, 0.94] 
+            transition={{
+              duration: 0.8,
+              delay: 0.7,
+              ease: [0.25, 0.46, 0.45, 0.94],
             }}
             className="text-2xl md:text-2xl text-slate-700 mb-16 max-w-3xl text-center font-medium"
           >
             Restore, enhance, and relive your most precious moments with
             stunning clarity. Fast, secure, and always free.
           </motion.p>
+
           <motion.button
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ 
-              duration: 0.8, 
-              delay: 0.9, 
-              ease: [0.25, 0.46, 0.45, 0.94] 
+            transition={{
+              duration: 0.8,
+              delay: 0.9,
+              ease: [0.25, 0.46, 0.45, 0.94],
             }}
-            whileHover={{ 
+            whileHover={{
               scale: 1.05,
-              transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }
+              transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] },
             }}
             whileTap={{ scale: 0.98 }}
             className="cursor-pointer px-8 py-3 rounded-xl font-bold text-lg shadow-md bg-orange-500 text-white border border-orange-600 relative overflow-hidden mb-24 sheen-btn transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-orange-300 hover:bg-orange-600"
@@ -242,41 +205,24 @@ export default function HomePage() {
           >
             Get Started Now
           </motion.button>
-          
-          {/* Enhanced Large Slider Card */}
+
+          {/* Optimized Animated Slider Wrapper */}
           <motion.div
-            ref={(node) => {
-              sliderRef.current = node;
-              sliderInViewRef(node);
-            }}
-            initial={{ opacity: 0, y: 80, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ 
-              duration: 1.2, 
-              delay: 1.1, 
-              ease: [0.25, 0.46, 0.45, 0.94] 
-            }}
-            style={{ 
+            style={{
               scale: sliderScale,
-              opacity: sliderOpacity,
               y: sliderY,
               rotateZ: sliderRotate,
-              filter: `drop-shadow(0 ${shadowBlur}px ${shadowBlur}px rgba(0, 0, 0, 0.12))`,
+              willChange: "transform",
+              transform: "translate3d(0,0,0)",
             }}
             className="w-full max-w-5xl mx-auto mb-8 perspective-1000"
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
           >
-            <motion.div 
+            <div
+              ref={(node) => {
+                sliderRef.current = node;
+                sliderInViewRef(node);
+              }}
               className="bg-white rounded-3xl shadow-2xl shadow-slate-900/15 flex items-center justify-center w-full h-[715px] p-2 slider-glow"
-              style={{
-                rotateX: mouseY,
-                rotateY: mouseX,
-              }}
-              whileHover={{ 
-                scale: 1.02,
-                transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }
-              }}
             >
               <div className="relative w-full h-[700px] rounded-xl overflow-hidden">
                 <ReactCompareSlider
@@ -302,27 +248,15 @@ export default function HomePage() {
                   handle={null}
                   position={sliderPosition}
                 />
-                {/* Enhanced Before/After Labels */}
-                <motion.span 
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 2.0 }}
-                  className="absolute left-4 top-4 bg-black/70 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none backdrop-blur-sm"
-                >
+                <span className="absolute left-4 top-4 bg-black/70 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none backdrop-blur-sm">
                   Before
-                </motion.span>
-                <motion.span 
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 2.0 }}
-                  className="absolute right-4 top-4 bg-black/70 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none backdrop-blur-sm"
-                >
+                </span>
+                <span className="absolute right-4 top-4 bg-black/70 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none backdrop-blur-sm">
                   After
-                </motion.span>
+                </span>
               </div>
-            </motion.div>
-            
-            {/* Enhanced Animated Down Arrow */}
+            </div>
+
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -330,15 +264,15 @@ export default function HomePage() {
               className="flex justify-center mt-6"
             >
               <motion.div
-                animate={{ 
+                animate={{
                   y: [0, 12, 0],
-                  scale: [1, 1.05, 1]
+                  scale: [1, 1.05, 1],
                 }}
                 transition={{
                   repeat: Infinity,
                   duration: 2.5,
                   ease: [0.25, 0.46, 0.45, 0.94],
-                  times: [0, 0.5, 1]
+                  times: [0, 0.5, 1],
                 }}
                 className="flex flex-col items-center"
               >
@@ -346,9 +280,7 @@ export default function HomePage() {
               </motion.div>
             </motion.div>
           </motion.div>
-          {/* End Slider */}
         </motion.section>
-        {/* End Hero Section */}
 
         <div
           className="mb-0 pb-16"
@@ -360,12 +292,10 @@ export default function HomePage() {
           <FeatureSections />
         </div>
 
-
         <div className="bg-gradient-to-b from-white via-slate-50 to-transparent">
           <Testimonials />
         </div>
 
-        {/* Stats Section */}
         <StatsSection />
 
         <FAQ faqs={faqs} />
