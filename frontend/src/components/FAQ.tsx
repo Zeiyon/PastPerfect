@@ -16,27 +16,30 @@ const FAQ: React.FC<FAQProps> = ({ faqs = [] }) => {
 
   return (
     <section className="max-w-6xl mx-auto my-24 px-4">
-      <div className=" w-full max-w-6xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-slate-600 text-center mb-8 tracking-tight">
-          Frequently Asked Questions
+      <div className="w-full max-w-6xl mx-auto">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-slate-800 text-center mb-4 tracking-tight">
+          Frequently asked questions
         </h2>
-        <ul className="divide-y divide-slate-200 max-w-3xl mx-auto">
+        <p className="text-lg md:text-xl text-slate-600 text-center mb-12 font-medium">
+          You've got questions. We've got answers
+        </p>
+        <ul className="max-w-4xl mx-auto divide-y divide-slate-200">
           {faqs.map((faq, idx) => (
             <li key={idx}>
               <button
-                className="w-full flex items-center justify-between text-left py-5 focus:outline-none group"
+                className="cursor-pointer w-full flex items-center justify-between text-left py-8 px-8 focus:outline-none group bg-transparent"
                 onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
                 aria-expanded={openIndex === idx}
               >
-                <span className="text-base md:text-lg font-medium text-slate-800 group-hover:text-orange-500 transition-colors">
+                <span className="text-1xl md:text-2xl font-semibold text-slate-700  leading-relaxed group-hover:text-orange-500 transition-colors">
                   {faq.question}
                 </span>
                 <motion.span
                   animate={{ rotate: openIndex === idx ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
-                  className="ml-4 text-orange-400"
+                  className="ml-6 text-orange-400"
                 >
-                  <ChevronDown size={22} />
+                  <ChevronDown size={34} />
                 </motion.span>
               </button>
               <AnimatePresence initial={false}>
@@ -49,7 +52,7 @@ const FAQ: React.FC<FAQProps> = ({ faqs = [] }) => {
                     transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                     className="overflow-hidden"
                   >
-                    <div className="pt-2 pb-4 px-1 text-slate-600 text-base md:text-lg leading-relaxed">
+                    <div className="pt-4 pb-10 px-8 text-slate-600 text-xl md:text-2xl leading-relaxed">
                       {faq.answer}
                     </div>
                   </motion.div>
@@ -58,13 +61,13 @@ const FAQ: React.FC<FAQProps> = ({ faqs = [] }) => {
             </li>
           ))}
         </ul>
-        <div className="mt-12 flex justify-center">
+        <div className="mt-20 flex justify-center">
           <a
             href="/knowledgebase"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold px-6 py-3 rounded-full shadow hover:from-orange-500 hover:to-orange-600 transition-all text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold px-8 py-4 rounded-full shadow hover:from-orange-500 hover:to-orange-600 transition-all text-xl md:text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400"
           >
             Have more questions? <span className="hidden sm:inline">See our knowledge base</span>
-            <ArrowRight size={20} className="ml-1" />
+            <ArrowRight size={28} className="ml-1" />
           </a>
         </div>
       </div>

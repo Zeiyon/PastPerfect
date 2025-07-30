@@ -14,7 +14,9 @@ const FeatureSections: React.FC = () => (
     {/* Restoration Marketing Section */}
     <motion.section
       {...sectionMotionProps}
-      style={{ boxShadow: '0 6px 24px 0 rgba(11,32,96,.05)' }}
+      style={{ 
+        boxShadow: '0 2px 8px 0 rgba(0, 0, 0, 0.08), 0 1px 3px 0 rgba(0, 0, 0, 0.04)',
+      }}
       className="relative border-1 border-slate-100 flex flex-col md:flex-row items-center justify-between gap-12 max-w-6xl mx-auto bg-white rounded-2xl p-8 md:p-16 overflow-hidden mb-12"
     >
       {/* Left: Interactive Slider */}

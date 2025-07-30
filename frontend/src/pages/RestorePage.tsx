@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { 
   Upload, 
@@ -54,6 +54,7 @@ export default function RestorePage() {
   })
   const [userRestorationsLeft] = useState(3)
   const [totalRestorations] = useState(5)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -108,7 +109,7 @@ export default function RestorePage() {
   const hasEnoughCredits = uploadedFiles.length <= userRestorationsLeft
 
   return (
-    <div className="min-h-screen pt-20 bg-gradient-to-b from-white via-slate-50 to-transparent">
+    <div className="min-h-screen pt-24 bg-gradient-to-b from-white via-slate-50 to-transparent">
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Header */}
         <motion.div 
@@ -251,156 +252,185 @@ export default function RestorePage() {
           transition={{ delay: 0.4 }}
           className="bg-white rounded-2xl p-7 shadow-lg border border-slate-200 mb-8"
         >
-          <div className="flex items-center mb-6">
-            <Settings className="w-6 h-6 mr-3 text-orange-500" />
-            <h3 className="text-xl font-semibold text-slate-900">Restoration Settings</h3>
-          </div>
+          <button
+            onClick={() => setSettingsOpen(!settingsOpen)}
+            className="flex items-center justify-between w-full text-left cursor-pointer"
+            type="button"
+          >
+            <div className="flex items-center">
+              <Settings className="w-6 h-6 mr-3 text-orange-500" />
+              <h3 className="text-xl font-semibold text-slate-900">Restoration Settings</h3>
+            </div>
+            <div className={`transform transition-transform duration-200 ${settingsOpen ? 'rotate-180' : ''}`}>
+              <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </button>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-              <div className="flex items-center">
-                <Sparkles className="w-6 h-6 text-orange-500 mr-4" />
-                <div>
-                  <p className="font-medium text-slate-900">Enhance Sharpness</p>
-                  <p className="text-sm text-slate-600">Improve image clarity and detail</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setSettings(prev => ({ ...prev, enhanceSharpness: !prev.enhanceSharpness }))}
-                className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
-                  settings.enhanceSharpness ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
-                }`}
-                type="button"
+          <AnimatePresence>
+            {settingsOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="mt-6 overflow-hidden"
               >
-                <span
-                  className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
-                  style={{
-                    transform: settings.enhanceSharpness ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
-                  }}
-                />
-              </button>
-            </div>
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: 0.1, duration: 0.2 }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+                >
+                <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                  <div className="flex items-center">
+                    <Sparkles className="w-6 h-6 text-orange-500 mr-4" />
+                    <div>
+                      <p className="font-medium text-slate-900">Enhance Sharpness</p>
+                      <p className="text-sm text-slate-600">Improve image clarity and detail</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSettings(prev => ({ ...prev, enhanceSharpness: !prev.enhanceSharpness }))}
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                      settings.enhanceSharpness ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
+                    }`}
+                    type="button"
+                  >
+                    <span
+                      className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
+                      style={{
+                        transform: settings.enhanceSharpness ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
+                      }}
+                    />
+                  </button>
+                </div>
 
-            <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-              <div className="flex items-center">
-                <Image className="w-6 h-6 text-orange-500 mr-4" />
-                <div>
-                  <p className="font-medium text-slate-900">Colorize</p>
-                  <p className="text-sm text-slate-600">Add color to black & white photos</p>
+                <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                  <div className="flex items-center">
+                    <Image className="w-6 h-6 text-orange-500 mr-4" />
+                    <div>
+                      <p className="font-medium text-slate-900">Colorize</p>
+                      <p className="text-sm text-slate-600">Add color to black & white photos</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSettings(prev => ({ ...prev, colorize: !prev.colorize }))}
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                      settings.colorize ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
+                    }`}
+                    type="button"
+                  >
+                    <span
+                      className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
+                      style={{
+                        transform: settings.colorize ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
+                      }}
+                    />
+                  </button>
                 </div>
-              </div>
-              <button
-                onClick={() => setSettings(prev => ({ ...prev, colorize: !prev.colorize }))}
-                className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
-                  settings.colorize ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
-                }`}
-                type="button"
-              >
-                <span
-                  className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
-                  style={{
-                    transform: settings.colorize ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
-                  }}
-                />
-              </button>
-            </div>
 
-            <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-              <div className="flex items-center">
-                <File className="w-6 h-6 text-orange-500 mr-4" />
-                <div>
-                  <p className="font-medium text-slate-900">Upscale Resolution</p>
-                  <p className="text-sm text-slate-600">Increase image resolution by 2x</p>
+                <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                  <div className="flex items-center">
+                    <File className="w-6 h-6 text-orange-500 mr-4" />
+                    <div>
+                      <p className="font-medium text-slate-900">Upscale Resolution</p>
+                      <p className="text-sm text-slate-600">Increase image resolution by 2x</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSettings(prev => ({ ...prev, upscaleResolution: !prev.upscaleResolution }))}
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                      settings.upscaleResolution ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
+                    }`}
+                    type="button"
+                  >
+                    <span
+                      className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
+                      style={{
+                        transform: settings.upscaleResolution ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
+                      }}
+                    />
+                  </button>
                 </div>
-              </div>
-              <button
-                onClick={() => setSettings(prev => ({ ...prev, upscaleResolution: !prev.upscaleResolution }))}
-                className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
-                  settings.upscaleResolution ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
-                }`}
-                type="button"
-              >
-                <span
-                  className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
-                  style={{
-                    transform: settings.upscaleResolution ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
-                  }}
-                />
-              </button>
-            </div>
 
-            <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-              <div className="flex items-center">
-                <Shield className="w-6 h-6 text-orange-500 mr-4" />
-                <div>
-                  <p className="font-medium text-slate-900">Remove Scratches</p>
-                  <p className="text-sm text-slate-600">Clean up surface damage</p>
+                <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                  <div className="flex items-center">
+                    <Shield className="w-6 h-6 text-orange-500 mr-4" />
+                    <div>
+                      <p className="font-medium text-slate-900">Remove Scratches</p>
+                      <p className="text-sm text-slate-600">Clean up surface damage</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSettings(prev => ({ ...prev, removeScratches: !prev.removeScratches }))}
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                      settings.removeScratches ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
+                    }`}
+                    type="button"
+                  >
+                    <span
+                      className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
+                      style={{
+                        transform: settings.removeScratches ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
+                      }}
+                    />
+                  </button>
                 </div>
-              </div>
-              <button
-                onClick={() => setSettings(prev => ({ ...prev, removeScratches: !prev.removeScratches }))}
-                className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
-                  settings.removeScratches ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
-                }`}
-                type="button"
-              >
-                <span
-                  className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
-                  style={{
-                    transform: settings.removeScratches ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
-                  }}
-                />
-              </button>
-            </div>
 
-            <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-              <div className="flex items-center">
-                <Zap className="w-6 h-6 text-orange-500 mr-4" />
-                <div>
-                  <p className="font-medium text-slate-900">Enhance Contrast</p>
-                  <p className="text-sm text-slate-600">Improve brightness and contrast</p>
+                <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                  <div className="flex items-center">
+                    <Zap className="w-6 h-6 text-orange-500 mr-4" />
+                    <div>
+                      <p className="font-medium text-slate-900">Enhance Contrast</p>
+                      <p className="text-sm text-slate-600">Improve brightness and contrast</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSettings(prev => ({ ...prev, enhanceContrast: !prev.enhanceContrast }))}
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                      settings.enhanceContrast ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
+                    }`}
+                    type="button"
+                  >
+                    <span
+                      className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
+                      style={{
+                        transform: settings.enhanceContrast ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
+                      }}
+                    />
+                  </button>
                 </div>
-              </div>
-              <button
-                onClick={() => setSettings(prev => ({ ...prev, enhanceContrast: !prev.enhanceContrast }))}
-                className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
-                  settings.enhanceContrast ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
-                }`}
-                type="button"
-              >
-                <span
-                  className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
-                  style={{
-                    transform: settings.enhanceContrast ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
-                  }}
-                />
-              </button>
-            </div>
 
-            <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-              <div className="flex items-center">
-                <Sparkles className="w-6 h-6 text-orange-500 mr-4" />
-                <div>
-                  <p className="font-medium text-slate-900">Remove Noise</p>
-                  <p className="text-sm text-slate-600">Reduce grain and digital noise</p>
+                <div className="flex items-center justify-between p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                  <div className="flex items-center">
+                    <Sparkles className="w-6 h-6 text-orange-500 mr-4" />
+                    <div>
+                      <p className="font-medium text-slate-900">Remove Noise</p>
+                      <p className="text-sm text-slate-600">Reduce grain and digital noise</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSettings(prev => ({ ...prev, removeNoise: !prev.removeNoise }))}
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                      settings.removeNoise ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
+                    }`}
+                    type="button"
+                  >
+                    <span
+                      className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
+                      style={{
+                        transform: settings.removeNoise ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
+                      }}
+                    />
+                  </button>
                 </div>
-              </div>
-              <button
-                onClick={() => setSettings(prev => ({ ...prev, removeNoise: !prev.removeNoise }))}
-                className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
-                  settings.removeNoise ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
-                }`}
-                type="button"
-              >
-                <span
-                  className="absolute top-1/2 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
-                  style={{
-                    transform: settings.removeNoise ? 'translateX(20px) translateY(-50%)' : 'translateX(0) translateY(-50%)'
-                  }}
-                />
-              </button>
-            </div>
-          </div>
+              </motion.div>
+            </motion.div>
+          )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Process Button */}
