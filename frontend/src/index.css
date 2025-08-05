@@ -16,6 +16,31 @@ html, body {
   box-sizing: border-box;
 }
 
+/* Mobile-first responsive styles to prevent flash */
+@media (max-width: 767px) {
+  .hero-background {
+    padding-top: 4rem !important;
+    padding-bottom: 3rem !important;
+  }
+  
+  .hero-background h1 {
+    font-size: 1.875rem !important;
+    line-height: 2.25rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .hero-background p {
+    font-size: 1rem !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  .hero-background button {
+    font-size: 0.875rem !important;
+    padding: 0.75rem 1rem !important;
+    margin-bottom: 2rem !important;
+  }
+}
+
 /* Custom slider styles */
 .slider::-webkit-slider-thumb {
   appearance: none;

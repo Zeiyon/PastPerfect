@@ -34,29 +34,29 @@ export default function StatsSection() {
   }, [isInView]);
 
   return (
-    <section ref={ref} className="max-w-7xl mx-auto px-4 mb-20">
-      <div className="flex flex-col md:flex-row items-center justify-center gap-10 md:gap-20 mt-18 mb-32">
-        <div className="flex flex-col items-center flex-1 min-w-[180px]">
-          <span className="text-5xl md:text-6xl font-bold text-slate-600 mb-2">
+    <section ref={ref} className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mb-16 sm:mb-20 md:mb-24 lg:mb-32">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-12 sm:gap-16 md:gap-20 lg:gap-32 mt-12 sm:mt-16 md:mt-20 lg:mt-24 mb-16 sm:mb-20 md:mb-24 lg:mb-32">
+        <div className="flex flex-col items-center flex-1 min-w-[160px] sm:min-w-[180px] md:min-w-[200px] lg:min-w-[220px]">
+          <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-slate-600 mb-3 sm:mb-4">
             {photos.toLocaleString()}+
           </span>
-          <span className="text-lg md:text-xl font-medium text-slate-700">
+          <span className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-medium text-slate-700 text-center">
             Photos Restored
           </span>
         </div>
-        <div className="flex flex-col items-center flex-1 min-w-[180px]">
-          <span className="text-5xl md:text-6xl font-bold text-slate-600 mb-2">
+        <div className="flex flex-col items-center flex-1 min-w-[160px] sm:min-w-[180px] md:min-w-[200px] lg:min-w-[220px]">
+          <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-slate-600 mb-3 sm:mb-4">
             {customers}+
           </span>
-          <span className="text-lg md:text-xl font-medium text-slate-700">
+          <span className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-medium text-slate-700 text-center">
             Happy Customers
           </span>
         </div>
-        <div className="flex flex-col items-center flex-1 min-w-[180px]">
-          <span className="text-5xl md:text-6xl font-bold text-slate-600 mb-2">
+        <div className="flex flex-col items-center flex-1 min-w-[160px] sm:min-w-[180px] md:min-w-[200px] lg:min-w-[220px]">
+          <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-slate-600 mb-3 sm:mb-4">
             {free}%
           </span>
-          <span className="text-lg md:text-xl font-medium text-slate-700">
+          <span className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-medium text-slate-700 text-center">
             Free Forever
           </span>
         </div>

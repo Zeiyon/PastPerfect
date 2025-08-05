@@ -13,6 +13,26 @@ import {
   ReactCompareSliderImage,
 } from "react-compare-slider";
 
+// Custom hook to detect mobile devices with proper SSR handling
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  // Return false during SSR and initial render to prevent hydration mismatch
+  return isClient ? isMobile : false;
+};
+
 const faqs = [
   {
     question: "What types of damage can PastPerfect restore?",
@@ -48,6 +68,8 @@ const heroExample = {
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [isClient, setIsClient] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
   const [sliderPosition, setSliderPosition] = useState(100);
   const springPosition = useSpring(100, {
@@ -69,6 +91,13 @@ export default function HomePage() {
   const sliderRotate = useMotionValue(0);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    // Only apply scroll animations on desktop and when client is ready
+    if (isMobile || !isClient) return;
+
     const update = () => {
       const y = scrollY.get();
 
@@ -90,9 +119,12 @@ export default function HomePage() {
 
     const frame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frame);
-  }, [scrollY]);
+  }, [scrollY, isMobile, isClient]);
 
   useEffect(() => {
+    // Apply slider animation when client is ready
+    if (!isClient) return;
+
     const sequence = async () => {
       await new Promise((resolve) => setTimeout(resolve, 1200));
       springPosition.set(50);
@@ -102,11 +134,11 @@ export default function HomePage() {
       return unsubscribe;
     };
     sequence();
-  }, [springPosition]);
+  }, [springPosition, isClient]);
 
   return (
     <div className="relative home-page">
-      <div className="space-y-24 pb-24 relative z-10">
+      <div className="space-y-8 sm:space-y-12 md:space-y-16 lg:space-y-24 pb-8 sm:pb-12 md:pb-16 lg:pb-24 pt-8 sm:pt-12 md:pt-16 lg:pt-24 relative z-10">
         <motion.section
           initial={{ scale: 0.98, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -119,7 +151,7 @@ export default function HomePage() {
             background:
               "linear-gradient(to bottom, #fff 0%, #f1f5f9 35%, #f1f5f9 100%)",
           }}
-          className="hero-background flex flex-col items-center justify-center pt-44 pb-[40rem] px-4 min-h-[70vh] relative mb-0"
+          className="hero-background flex flex-col items-center justify-center pt-16 sm:pt-20 md:pt-24 lg:pt-44 pb-12 sm:pb-14 md:pb-16 lg:pb-[40rem] px-4 min-h-[50vh] md:min-h-[70vh] relative mb-0"
         >
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -129,7 +161,7 @@ export default function HomePage() {
               delay: 0.3,
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
-            className="text-6xl md:text-7xl font-extrabold text-slate-900 mb-10 text-center leading-tight tracking-tight drop-shadow-lg"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-slate-900 mb-4 sm:mb-6 md:mb-8 lg:mb-10 text-center leading-tight tracking-tight drop-shadow-lg px-4"
           >
             Reimagine your
           </motion.h1>
@@ -142,13 +174,13 @@ export default function HomePage() {
               delay: 0.5,
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
-            className="flex items-center justify-center mb-12 text-center"
+            className="flex items-center justify-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 text-center px-4"
           >
             <span
-              className="text-6xl md:text-7xl font-extrabold text-center tracking-wide"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-center tracking-wide"
               style={{ letterSpacing: "0.05em" }}
             >
-              <span className="ml-8 text-orange-500 font-extrabold">
+              <span className="ml-1 sm:ml-2 md:ml-4 lg:ml-8 text-orange-500 font-extrabold">
                 <TypeAnimation
                   sequence={[
                     "Memories",
@@ -180,7 +212,7 @@ export default function HomePage() {
               delay: 0.7,
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
-            className="text-2xl md:text-2xl text-slate-700 mb-16 max-w-3xl text-center font-medium"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-700 mb-8 sm:mb-10 md:mb-12 lg:mb-16 max-w-2xl sm:max-w-3xl text-center font-medium px-4"
           >
             Restore, enhance, and relive your most precious moments with
             stunning clarity. Fast, secure, and always free.
@@ -199,9 +231,9 @@ export default function HomePage() {
               transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] },
             }}
             whileTap={{ scale: 0.98 }}
-            className="cursor-pointer px-8 py-3 rounded-xl font-bold text-lg shadow-md bg-orange-500 text-white border border-orange-600 relative overflow-hidden mb-24 sheen-btn transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-orange-300 hover:bg-orange-600"
+            className="cursor-pointer px-4 sm:px-6 md:px-8 py-3 md:py-3 rounded-xl font-bold text-sm sm:text-base md:text-lg shadow-md bg-orange-600 text-white border border-orange-700 relative overflow-hidden mb-8 sm:mb-12 md:mb-16 lg:mb-24 sheen-btn transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-orange-300 hover:bg-orange-600"
             type="button"
-            onClick={() => navigate("/upscale")}
+            onClick={() => navigate("/restore")}
           >
             Get Started Now
           </motion.button>
@@ -215,16 +247,16 @@ export default function HomePage() {
               willChange: "transform",
               transform: "translate3d(0,0,0)",
             }}
-            className="w-full max-w-5xl mx-auto mb-8 perspective-1000"
+            className="w-full max-w-4xl lg:max-w-5xl mx-auto mb-6 sm:mb-8 perspective-1000 px-4"
           >
             <div
               ref={(node) => {
                 sliderRef.current = node;
                 sliderInViewRef(node);
               }}
-              className="bg-white rounded-3xl shadow-2xl shadow-slate-900/15 flex items-center justify-center w-full h-[715px] p-2 slider-glow"
+              className="bg-white rounded-2xl md:rounded-3xl shadow-xl md:shadow-2xl shadow-slate-900/15 flex items-center justify-center w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[715px] p-2 slider-glow"
             >
-              <div className="relative w-full h-[700px] rounded-xl overflow-hidden">
+              <div className="relative w-full h-[280px] sm:h-[380px] md:h-[480px] lg:h-[700px] rounded-xl overflow-hidden">
                 <ReactCompareSlider
                   itemOne={
                     <ReactCompareSliderImage
@@ -248,10 +280,10 @@ export default function HomePage() {
                   handle={null}
                   position={sliderPosition}
                 />
-                <span className="absolute left-4 top-4 bg-black/70 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none backdrop-blur-sm">
+                <span className="absolute left-2 sm:left-3 md:left-4 top-2 sm:top-3 md:top-4 bg-black/70 text-white text-xs font-semibold px-2 md:px-3 py-1 rounded-full z-10 select-none backdrop-blur-sm">
                   Before
                 </span>
-                <span className="absolute right-4 top-4 bg-black/70 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 select-none backdrop-blur-sm">
+                <span className="absolute right-2 sm:right-3 md:right-4 top-2 sm:top-3 md:top-4 bg-black/70 text-white text-xs font-semibold px-2 md:px-3 py-1 rounded-full z-10 select-none backdrop-blur-sm">
                   After
                 </span>
               </div>
@@ -261,7 +293,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 2.2 }}
-              className="flex justify-center mt-6"
+              className="flex justify-center mt-3 sm:mt-4 md:mt-6"
             >
               <motion.div
                 animate={{
@@ -276,14 +308,14 @@ export default function HomePage() {
                 }}
                 className="flex flex-col items-center"
               >
-                <ChevronDown className="w-6 h-6 text-orange-500 opacity-80 mb-1" />
+                <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-orange-500 opacity-80 mb-1" />
               </motion.div>
             </motion.div>
           </motion.div>
         </motion.section>
 
         <div
-          className="mb-0 pb-16"
+          className="mb-0 pb-6 sm:pb-8 md:pb-12 lg:pb-16"
           style={{
             background:
               "linear-gradient(to bottom, #f1f5f9 0%, #fff 45%, #fff 100%)",

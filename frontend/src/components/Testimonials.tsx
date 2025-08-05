@@ -64,38 +64,38 @@ const Testimonials: React.FC = () => (
   viewport={{ once: true, amount: 0.4 }}
   transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
 >
-  <section className="w-full py-20 px-4">
-    <h2 className="text-center text-2xl md:text-3xl font-bold text-slate-900 mb-12 tracking-tight">
+  <section className="w-full py-12 sm:py-16 md:py-20 px-4">
+    <h2 className="text-center text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-8 sm:mb-10 md:mb-12 tracking-tight">
       See how PastPerfect brings memories back to life
     </h2>
-    <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3">
+    <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
       {[col1, col2, col3].map((col, idx) => (
         <div
           key={idx}
-          className="relative h-[500px] overflow-hidden flex flex-col"
+          className="relative h-[400px] sm:h-[450px] md:h-[500px] overflow-hidden flex flex-col"
         >
           {/* Top Fade */}
-          <div className="pointer-events-none absolute top-0 left-0 w-full h-10 z-10"
+          <div className="pointer-events-none absolute top-0 left-0 w-full h-8 sm:h-10 z-10"
                style={{background: 'linear-gradient(to bottom, #f8fafc 1%, transparent)'}} />
           {/* Bottom Fade */}
-          <div className="pointer-events-none absolute bottom-0 left-0 w-full h-10 z-10"
+          <div className="pointer-events-none absolute bottom-0 left-0 w-full h-8 sm:h-10 z-10"
                style={{background: 'linear-gradient(to top, #f8fafc 10%, transparent)'}} />
 
           <div
-            className={`absolute px-4 w-full flex flex-col gap-6 animate-${idx === 1 ? 'testimonials-scroll-up' : 'testimonials-scroll-down'}`}
+            className={`absolute px-3 sm:px-4 w-full flex flex-col gap-4 sm:gap-6 animate-${idx === 1 ? 'testimonials-scroll-up' : 'testimonials-scroll-down'}`}
             style={{ animationDuration: '30s', animationTimingFunction: 'linear', animationIterationCount: 'infinite' }}
           >
             {[...col, ...col].map((t, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-slate-100 hover:border-orange-400 transition-colors p-6 flex flex-col shadow-lg min-h-[180px]">
-                <p className="text-slate-700 text-base mb-6 leading-relaxed opacity-90">
+              <div key={i} className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 hover:border-orange-400 transition-colors p-4 sm:p-6 flex flex-col shadow-lg min-h-[160px] sm:min-h-[180px]">
+                <p className="text-slate-700 text-sm sm:text-base mb-4 sm:mb-6 leading-relaxed opacity-90">
                   {t.quote}
                 </p>
                 <div className="flex items-center mt-auto">
                   {t.avatar ? (
-                    <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full mr-3 border-2 border-slate-200" />
+                    <img src={t.avatar} alt={t.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-3 border-2 border-slate-200" />
                   ) : null}
                   <div>
-                    <div className="text-slate-900 font-semibold text-sm">{t.name}</div>
+                    <div className="text-slate-900 font-semibold text-xs sm:text-sm">{t.name}</div>
                     <div className="text-xs text-slate-500">
                       {t.title} / <a href={t.companyUrl} className="text-orange-500 hover:underline font-medium">{t.company}</a>
                     </div>

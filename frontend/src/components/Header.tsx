@@ -9,6 +9,7 @@ interface HeaderProps {
 export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
   const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     const onScroll = () => {
@@ -17,6 +18,11 @@ export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [location.pathname])
 
   return (
     <header className={`fixed top-0 left-0 right-0 container max-w-7xl mx-auto z-50 transition-all duration-800 ${
@@ -35,7 +41,7 @@ export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
             <span className="text-2xl font-extrabold text-slate-900 tracking-tight">PastPerfect</span>
           </Link>
 
-          {/* Center Navigation */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-6">
             <Link 
               to="/" 
@@ -82,8 +88,8 @@ export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
             </Link>
           </nav>
 
-          {/* Auth Buttons (Right Side) */}
-          <div className="flex items-center space-x-4">
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
             <button
               type="button"
               onClick={onLoginClick}
@@ -100,6 +106,97 @@ export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
             </button>
           </div>
 
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-white/20 transition-colors"
+            aria-label="Toggle mobile menu"
+          >
+            <div className="w-6 h-6 flex flex-col justify-center items-center">
+              <span className={`block w-5 h-0.5 bg-slate-700 transition-all duration-300 ${
+                mobileMenuOpen ? 'rotate-45 translate-y-1' : ''
+              }`}></span>
+              <span className={`block w-5 h-0.5 bg-slate-700 transition-all duration-300 mt-1 ${
+                mobileMenuOpen ? 'opacity-0' : ''
+              }`}></span>
+              <span className={`block w-5 h-0.5 bg-slate-700 transition-all duration-300 mt-1 ${
+                mobileMenuOpen ? '-rotate-45 -translate-y-1' : ''
+              }`}></span>
+            </div>
+          </button>
+
+        </div>
+
+        {/* Mobile Menu */}
+        <div className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
+          mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}>
+          <div className="py-4 space-y-4 border-t border-slate-200/50">
+            {/* Mobile Navigation */}
+            <nav className="space-y-3">
+              <Link 
+                to="/" 
+                className={`block py-2 px-4 rounded-lg transition-colors ${
+                  location.pathname === '/' 
+                    ? 'text-orange-600 bg-orange-50' 
+                    : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
+                }`}
+              >
+                Home
+              </Link>
+              <Link 
+                to="/restore" 
+                className={`block py-2 px-4 rounded-lg transition-colors ${
+                  location.pathname === '/restore' 
+                    ? 'text-orange-600 bg-orange-50' 
+                    : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
+                }`}
+              >
+                Restore
+              </Link>
+              <Link 
+                to="/upscale" 
+                className={`block py-2 px-4 rounded-lg transition-colors ${
+                  location.pathname === '/upscale' 
+                    ? 'text-orange-600 bg-orange-50' 
+                    : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
+                }`}
+              >
+                <span className="flex items-center justify-between">
+                  Upscale
+                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-600">Free</span>
+                </span>
+              </Link>
+              <Link 
+                to="/pricing" 
+                className={`block py-2 px-4 rounded-lg transition-colors ${
+                  location.pathname === '/pricing' 
+                    ? 'text-orange-600 bg-orange-50' 
+                    : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
+                }`}
+              >
+                Pricing
+              </Link>
+            </nav>
+
+            {/* Mobile Auth Buttons */}
+            <div className="pt-4 space-y-3 border-t border-slate-200/50">
+              <button
+                type="button"
+                onClick={onLoginClick}
+                className="w-full py-2 px-4 rounded-lg font-semibold text-orange-600 border border-orange-400 bg-white hover:border-orange-600 hover:shadow-md transition-all shadow-sm"
+              >
+                Log In
+              </button>
+              <button
+                type="button"
+                onClick={onSignUpClick}
+                className="w-full py-2 px-4 rounded-lg font-semibold text-white bg-gradient-to-r border border-orange-400 from-orange-400 to-orange-600 shadow hover:border-orange-600 hover:shadow-md transition-all"
+              >
+                Sign Up
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </header>
