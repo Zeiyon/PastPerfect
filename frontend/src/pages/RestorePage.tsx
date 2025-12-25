@@ -7,17 +7,11 @@ import {
   X, 
   Settings, 
   Sparkles, 
-  Zap, 
-  Star, 
-  Users, 
-  Award,
-  HelpCircle,
-  Clock,
+  Zap,
   Shield,
   Lock,
   CheckCircle,
   AlertCircle,
-  Info,
   Image,
   File
 } from 'lucide-react'
@@ -221,21 +215,24 @@ export default function RestorePage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {uploadedFiles.map((file) => (
-                <div key={file.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                  <div className="flex items-center space-x-4">
+                <div key={file.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors gap-3">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
                     <img 
                       src={file.preview} 
                       alt={file.originalName}
-                      className="w-14 h-14 object-cover rounded-lg shadow-sm"
+                      className="w-14 h-14 object-cover rounded-lg shadow-sm flex-shrink-0"
                     />
-                    <div>
-                      <p className="font-medium text-slate-900">{file.originalName}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-slate-900 truncate" title={file.originalName}>
+                        {file.originalName}
+                      </p>
                       <p className="text-sm text-slate-500">{formatFileSize(file.size)}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => removeFile(file.id)}
-                    className="p-2 text-slate-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                    className="p-2 text-slate-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 flex-shrink-0 cursor-pointer"
+                    type="button"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -247,13 +244,13 @@ export default function RestorePage() {
 
         {/* Restoration Settings */}
         <motion.div
+          onClick={() => setSettingsOpen(!settingsOpen)}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl p-7 shadow-lg border border-slate-200 mb-8"
+          className="bg-white cursor-pointer rounded-2xl p-7 shadow-lg border border-slate-200 mb-8"
         >
           <button
-            onClick={() => setSettingsOpen(!settingsOpen)}
             className="flex items-center justify-between w-full text-left cursor-pointer"
             type="button"
           >
@@ -294,7 +291,7 @@ export default function RestorePage() {
                   </div>
                   <button
                     onClick={() => setSettings(prev => ({ ...prev, enhanceSharpness: !prev.enhanceSharpness }))}
-                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 cursor-pointer ${
                       settings.enhanceSharpness ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
                     }`}
                     type="button"
@@ -318,7 +315,7 @@ export default function RestorePage() {
                   </div>
                   <button
                     onClick={() => setSettings(prev => ({ ...prev, colorize: !prev.colorize }))}
-                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 cursor-pointer ${
                       settings.colorize ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
                     }`}
                     type="button"
@@ -342,7 +339,7 @@ export default function RestorePage() {
                   </div>
                   <button
                     onClick={() => setSettings(prev => ({ ...prev, upscaleResolution: !prev.upscaleResolution }))}
-                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 cursor-pointer ${
                       settings.upscaleResolution ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
                     }`}
                     type="button"
@@ -366,7 +363,7 @@ export default function RestorePage() {
                   </div>
                   <button
                     onClick={() => setSettings(prev => ({ ...prev, removeScratches: !prev.removeScratches }))}
-                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 cursor-pointer ${
                       settings.removeScratches ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
                     }`}
                     type="button"
@@ -390,7 +387,7 @@ export default function RestorePage() {
                   </div>
                   <button
                     onClick={() => setSettings(prev => ({ ...prev, enhanceContrast: !prev.enhanceContrast }))}
-                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 cursor-pointer ${
                       settings.enhanceContrast ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
                     }`}
                     type="button"
@@ -414,7 +411,7 @@ export default function RestorePage() {
                   </div>
                   <button
                     onClick={() => setSettings(prev => ({ ...prev, removeNoise: !prev.removeNoise }))}
-                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 ${
+                    className={`relative flex items-center h-7 w-12 rounded-full transition-colors duration-200 p-1 cursor-pointer ${
                       settings.removeNoise ? 'bg-orange-500 shadow-md' : 'bg-slate-300'
                     }`}
                     type="button"
@@ -460,7 +457,7 @@ export default function RestorePage() {
           <button
             onClick={handleProcess}
             disabled={uploadedFiles.length === 0 || !hasEnoughCredits}
-            className={`w-full flex items-center justify-center space-x-3 py-4 px-8 rounded-xl font-medium transition-colors duration-200 ${
+            className={`cursor-pointer w-full flex items-center justify-center space-x-3 py-4 px-8 rounded-xl font-medium transition-colors duration-200 ${
               uploadedFiles.length === 0 || !hasEnoughCredits
                 ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                 : 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl'
