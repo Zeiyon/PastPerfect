@@ -1,3 +1,20 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Replicate
+.replicate/ # This is where Replicate stores its cache
+
+
 # Image files
 *.jpg
 *.jpeg

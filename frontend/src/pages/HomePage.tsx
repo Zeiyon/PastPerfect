@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { motion, useScroll, useSpring, useMotionValue } from "framer-motion";
+import { motion, useSpring, useScroll, useMotionValue } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import Testimonials from "../components/Testimonials";
@@ -12,26 +12,6 @@ import {
   ReactCompareSlider,
   ReactCompareSliderImage,
 } from "react-compare-slider";
-
-// Custom hook to detect mobile devices with proper SSR handling
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
-    return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
-
-  // Return false during SSR and initial render to prevent hydration mismatch
-  return isClient ? isMobile : false;
-};
 
 const faqs = [
   {
@@ -68,7 +48,6 @@ const heroExample = {
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
   const [sliderPosition, setSliderPosition] = useState(100);
@@ -85,41 +64,53 @@ export default function HomePage() {
 
   const { scrollY } = useScroll();
 
-  // Manual motion values for smoother performance
-  const sliderScale = useMotionValue(1);
-  const sliderY = useMotionValue(0);
-  const sliderRotate = useMotionValue(0);
+  // Motion values for 3D perspective effect
+  // Start looking up at user (positive rotateX tilts backward/up), then straighten
+  const rotateX = useMotionValue(15);
+  const rotateY = useMotionValue(0);
+  const perspectiveValue = useMotionValue(1000);
+  const perspectiveContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsClient(true);
+    // Set initial perspective
+    if (perspectiveContainerRef.current) {
+      perspectiveContainerRef.current.style.perspective = "1000px";
+    }
   }, []);
 
   useEffect(() => {
-    // Only apply scroll animations on desktop and when client is ready
-    if (isMobile || !isClient) return;
+    if (!isClient) return;
 
     const update = () => {
       const y = scrollY.get();
 
-      // Scale: 1 → 1.25 from y = 300 to y = 800
-      const scale =
-        y < 300 ? 1 : y < 800 ? 1 + (y - 300) / 2000 : 1.25;
-      sliderScale.set(scale);
+      // Calculate scroll progress (0 to 1) from scroll position 0 to 800
+      const scrollRange = 600;
+      const progress = Math.min(y / scrollRange, 1);
 
-      // Y translation: 0 → 600 from y = 300 to y = 1000
-      const newY = y < 300 ? 0 : y < 1000 ? ((y - 300) / 700) * 600 : 600;
-      sliderY.set(newY);
+      // Interpolate rotations: start looking up at user, end straight
+      // rotateX: 15deg (looking up) → 0deg (straight)
+      rotateX.set(12 * (1 - progress));
+      
+      // rotateY: 0deg → 0deg (keep it centered)
+      rotateY.set(0);
 
-      // Rotation: 0 → 2 degrees from y = 0 to y = 1000
-      const rotate = Math.min(y / 500, 2);
-      sliderRotate.set(rotate);
+      // Perspective: start with more depth, reduce as it straightens
+      const perspective = 1000 - (progress * 200);
+      perspectiveValue.set(perspective);
+      
+      // Update perspective on container directly
+      if (perspectiveContainerRef.current) {
+        perspectiveContainerRef.current.style.perspective = `${perspective}px`;
+      }
 
       requestAnimationFrame(update);
     };
 
     const frame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frame);
-  }, [scrollY, isMobile, isClient]);
+  }, [scrollY, isClient, rotateX, rotateY, perspectiveValue]);
 
   useEffect(() => {
     // Apply slider animation when client is ready
@@ -138,6 +129,18 @@ export default function HomePage() {
 
   return (
     <div className="relative home-page">
+      {/* Background Pattern for entire page */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at 2px 2px, rgba(148, 163, 184, 0.1) 2.5px, transparent 0),
+            radial-gradient(circle at 30px 30px, rgba(148, 163, 184, 0.10) 2px, transparent 0)
+          `,
+          backgroundSize: "60px 60px, 60px 60px",
+          backgroundPosition: "0 0, 0 0",
+        }}
+      />
       <div className="space-y-8 sm:space-y-12 md:space-y-16 lg:space-y-24 pb-8 sm:pb-12 md:pb-16 lg:pb-24 pt-8 sm:pt-12 md:pt-16 lg:pt-24 relative z-10">
         <motion.section
           initial={{ scale: 0.98, opacity: 0, y: 20 }}
@@ -151,8 +154,27 @@ export default function HomePage() {
             background:
               "linear-gradient(to bottom, #fff 0%, #f1f5f9 35%, #f1f5f9 100%)",
           }}
-          className="hero-background flex flex-col items-center justify-center pt-16 sm:pt-20 md:pt-24 lg:pt-44 pb-12 sm:pb-14 md:pb-16 lg:pb-[40rem] px-4 min-h-[50vh] md:min-h-[70vh] relative mb-0"
+          className="hero-background flex flex-col items-center justify-center pt-16 sm:pt-20 md:pt-24 lg:pt-32 pb-12 sm:pb-14 md:pb-16 lg:pb-20 px-4 min-h-[50vh] md:min-h-[70vh] relative mb-0 overflow-hidden"
         >
+          {/* Subtle Background Pattern with smooth fade */}
+          <div
+            className="absolute inset-0 pointer-events-none z-0"
+            style={{
+              backgroundImage: `
+                radial-gradient(circle at 2px 2px, rgba(148, 163, 184, 0.1) 2.5px, transparent 0),
+                radial-gradient(circle at 30px 30px, rgba(148, 163, 184, 0.10) 2px, transparent 0)
+              `,
+              backgroundSize: "60px 60px, 60px 60px",
+              backgroundPosition: "0 0, 0 0",
+            }}
+          />
+          {/* Smooth fade overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none z-0"
+            style={{
+              background: "linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 10%, transparent 20%, transparent 80%, rgba(241,245,249,0.7) 90%, rgba(241,245,249,1) 100%)",
+            }}
+          />
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -161,7 +183,7 @@ export default function HomePage() {
               delay: 0.3,
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-slate-900 mb-4 sm:mb-6 md:mb-8 lg:mb-10 text-center leading-tight tracking-tight drop-shadow-lg px-4"
+            className="relative z-10 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-slate-900 mb-4 sm:mb-6 md:mb-8 lg:mb-10 text-center leading-tight tracking-tight drop-shadow-lg px-4"
           >
             Reimagine your
           </motion.h1>
@@ -174,7 +196,7 @@ export default function HomePage() {
               delay: 0.5,
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
-            className="flex items-center justify-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 text-center px-4"
+            className="relative z-10 flex items-center justify-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 text-center px-4"
           >
             <span
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-center tracking-wide"
@@ -184,14 +206,12 @@ export default function HomePage() {
                 <TypeAnimation
                   sequence={[
                     "Memories",
-                    1000,
+                    2000,
                     "Photos",
                     1000,
-                    "Videos",
+                    "Family",
                     1000,
-                    "Selfies",
-                    1000,
-                    "Scans",
+                    "Loved Ones",
                     1000,
                   ]}
                   wrapper="span"
@@ -212,10 +232,10 @@ export default function HomePage() {
               delay: 0.7,
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
-            className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-700 mb-8 sm:mb-10 md:mb-12 lg:mb-16 max-w-2xl sm:max-w-3xl text-center font-medium px-4"
+            className="relative z-10 text-base sm:text-lg md:text-xl lg:text-2xl text-slate-700 mb-8 sm:mb-10 md:mb-12 lg:mb-16 max-w-2xl sm:max-w-3xl text-center font-medium px-4"
           >
             Restore, enhance, and relive your most precious moments with
-            stunning clarity. Fast, secure, and always free.
+            stunning clarity. Fast, secure, and just a tap away.
           </motion.p>
 
           <motion.button
@@ -231,7 +251,7 @@ export default function HomePage() {
               transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] },
             }}
             whileTap={{ scale: 0.98 }}
-            className="cursor-pointer px-4 sm:px-6 md:px-8 py-3 md:py-3 rounded-xl font-bold text-sm sm:text-base md:text-lg shadow-md bg-orange-600 text-white border border-orange-700 relative overflow-hidden mb-8 sm:mb-12 md:mb-16 lg:mb-24 sheen-btn transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-orange-300 hover:bg-orange-600"
+            className="relative z-10 cursor-pointer px-4 sm:px-6 md:px-8 py-3 md:py-3 rounded-xl font-bold text-sm sm:text-base md:text-lg shadow-md bg-orange-600 text-white border border-orange-700 overflow-hidden mb-4 sm:mb-6 md:mb-8 lg:mb-12 sheen-btn transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-orange-300 hover:bg-orange-600"
             type="button"
             onClick={() => navigate("/restore")}
           >
@@ -239,24 +259,27 @@ export default function HomePage() {
           </motion.button>
 
           {/* Optimized Animated Slider Wrapper */}
-          <motion.div
+          <div 
+            ref={perspectiveContainerRef}
+            className="relative z-10 w-full max-w-[95vw] xl:max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-2 sm:px-4"
             style={{
-              scale: sliderScale,
-              y: sliderY,
-              rotateZ: sliderRotate,
-              willChange: "transform",
-              transform: "translate3d(0,0,0)",
+              transformStyle: "preserve-3d",
             }}
-            className="w-full max-w-4xl lg:max-w-5xl mx-auto mb-6 sm:mb-8 perspective-1000 px-4"
           >
-            <div
+            <motion.div
               ref={(node) => {
                 sliderRef.current = node;
                 sliderInViewRef(node);
               }}
-              className="bg-white rounded-2xl md:rounded-3xl shadow-xl md:shadow-2xl shadow-slate-900/15 flex items-center justify-center w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[715px] p-2 slider-glow"
+              style={{
+                rotateX: rotateX,
+                rotateY: rotateY,
+                transformStyle: "preserve-3d",
+                willChange: "transform",
+              }}
+              className="bg-white rounded-2xl md:rounded-3xl shadow-xl md:shadow-2xl shadow-slate-900/15 flex items-center justify-center w-full h-[400px] sm:h-[500px] md:h-[650px] lg:h-[900px] xl:h-[1000px] p-2 slider-glow"
             >
-              <div className="relative w-full h-[280px] sm:h-[380px] md:h-[480px] lg:h-[700px] rounded-xl overflow-hidden">
+              <div className="relative w-full h-[380px] sm:h-[480px] md:h-[630px] lg:h-[880px] xl:h-[980px] rounded-xl overflow-hidden">
                 <ReactCompareSlider
                   itemOne={
                     <ReactCompareSliderImage
@@ -287,30 +310,20 @@ export default function HomePage() {
                   After
                 </span>
               </div>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 2.2 }}
-              className="flex justify-center mt-3 sm:mt-4 md:mt-6"
-            >
-              <motion.div
-                animate={{
-                  y: [0, 12, 0],
-                  scale: [1, 1.05, 1],
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 2.5,
-                  ease: [0.25, 0.46, 0.45, 0.94],
-                  times: [0, 0.5, 1],
-                }}
-                className="flex flex-col items-center"
-              >
-                <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-orange-500 opacity-80 mb-1" />
-              </motion.div>
             </motion.div>
+          </div>
+
+          {/* Animated Down Arrow */}
+          <motion.div
+            animate={{ y: [0, 15, 0] }}
+            transition={{
+              repeat: Infinity,
+              duration: 2,
+              ease: "easeInOut",
+            }}
+            className="relative z-10 flex justify-center mt-6 sm:mt-8"
+          >
+            <ChevronDown className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500 opacity-80" />
           </motion.div>
         </motion.section>
 
