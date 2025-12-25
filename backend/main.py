@@ -37,6 +37,9 @@ replicate_client = replicate.Client(
     timeout=Timeout(300.0)
 )
 
+# Get imgbb API key from environment or use default
+imgbb_api_key = os.getenv("IMGBB_API_KEY", "7a6c28a2611a933130804a2663888d5a")
+
 @app.get("/")
 async def root():
     return {"message": "PastPerfect API is running"}
@@ -78,37 +81,54 @@ def run_prediction_poll(model_or_version, input_data):
         print(f"Prediction failure details: {error_msg}")
         raise Exception(error_msg)
 
-@app.get("/restore")
-async def restore():
+def upload_to_imgbb(file_content: bytes, imgbb_api_key: str):
+    """Upload file content to imgbb and return the URL"""
+    files = {"image": ("image.jpg", file_content, "image/jpeg")}
+    response = requests.post(
+        "https://api.imgbb.com/1/upload",
+        params={"key": imgbb_api_key},
+        files=files
+    )
+    response.raise_for_status()
+    json_data = response.json()
+    return json_data["data"]["url"]
+
+def get_next_available_filename(backend_dir):
+    """Find the next available filename in the pattern testimg_XXX.jpg"""
+    existing_files = []
+    for filename in os.listdir(backend_dir):
+        if filename.startswith("testimg_") and filename.endswith(".jpg"):
+            try:
+                # Extract the number from testimg_XXX.jpg
+                num_str = filename.replace("testimg_", "").replace(".jpg", "")
+                num = int(num_str)
+                existing_files.append(num)
+            except ValueError:
+                continue
+    
+    # Find the next available number (handles gaps)
+    if not existing_files:
+        next_num = 1
+    else:
+        next_num = max(existing_files) + 1
+    
+    # Zero-pad to 3 digits
+    next_filename = f"testimg_{next_num:03d}.jpg"
+    return next_filename
+
+@app.post("/restore")
+async def restore(file: UploadFile = File(...)):
     try:
-        # Get the path to testimg.jpg in the backend directory
+        # Get the backend directory path
         backend_dir = os.path.dirname(os.path.abspath(__file__))
-        testimg_path = os.path.join(backend_dir, "testimg.jpg")
         
-        if not os.path.exists(testimg_path):
-            return JSONResponse(
-                status_code=404,
-                content={"success": False, "error": f"testimg.jpg not found at {testimg_path}"}
-            )
-        
-        print(f"Reading testimg.jpg from: {testimg_path}")
+        # Read the uploaded file content
+        file_content = await file.read()
         
         # Upload image to imgbb (temporary hosting service) so Replicate can access it
         # Replicate models need URLs, not local file paths
-        def upload_to_imgbb(local_path, imgbb_api_key):
-            """Upload a local file to imgbb and return the URL"""
-            with open(local_path, "rb") as f:
-                response = requests.post(
-                    "https://api.imgbb.com/1/upload",
-                    params={"key": imgbb_api_key},
-                    files={"image": f}
-                )
-            response.raise_for_status()
-            json_data = response.json()
-            return json_data["data"]["url"]
-        
-        # Upload the image to imgbb
-        image_url = upload_to_imgbb(testimg_path, imgbb_api_key)
+        print("Uploading image to imgbb...")
+        image_url = upload_to_imgbb(file_content, imgbb_api_key)
         print(f"Uploaded to imgbb, URL: {image_url}")
         
         # Process through FLUX Kontext restore-image model
@@ -124,17 +144,21 @@ async def restore():
         response = requests.get(restored_url)
         response.raise_for_status()
         
-        # Save the image as testimg_output.jpg
-        output_path = os.path.join(backend_dir, "testimg_output.jpg")
-        with open(output_path, "wb") as f:
+        # Find the next available filename for the result
+        next_filename = get_next_available_filename(backend_dir)
+        saved_path = os.path.join(backend_dir, next_filename)
+        
+        # Save the restored image
+        with open(saved_path, "wb") as f:
             f.write(response.content)
-        print(f"Saved restored image to: {output_path}")
+        print(f"Saved restored image to: {saved_path}")
         
         return JSONResponse(content={
             "success": True,
             "original": image_url,
             "restored": restored_url,
-            "output_file": output_path
+            "saved_file": next_filename,
+            "saved_path": saved_path
         })
         
     except Exception as e:

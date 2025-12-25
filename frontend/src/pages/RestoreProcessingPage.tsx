@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -49,6 +49,15 @@ interface ProcessingSettings {
   fixLighting: boolean
 }
 
+interface StoredFileData {
+  id: string
+  base64: string
+  preview: string
+  originalName: string
+  size: number
+  type: string
+}
+
 export default function RestoreProcessingPage() {
   const navigate = useNavigate()
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
@@ -68,6 +77,7 @@ export default function RestoreProcessingPage() {
     "We're carefully analyzing every detail of your photos..."
   ])
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0)
+  const hasStartedProcessing = useRef(false)
 
   const startProcessing = async (files: UploadedFile[], processingSettings: ProcessingSettings) => {
     setIsProcessing(true)
@@ -150,16 +160,44 @@ export default function RestoreProcessingPage() {
   }
 
   useEffect(() => {
+    // Prevent duplicate processing in React StrictMode
+    if (hasStartedProcessing.current) {
+      return
+    }
+    
     // Load data from sessionStorage
     const filesData = sessionStorage.getItem('restoreFiles')
     const settingsData = sessionStorage.getItem('restoreSettings')
     
     if (filesData && settingsData) {
-      const parsedFiles = JSON.parse(filesData)
+      hasStartedProcessing.current = true
+      
+      const parsedFilesData = JSON.parse(filesData)
       const parsedSettings = JSON.parse(settingsData)
-      setUploadedFiles(parsedFiles)
-      // Start processing with the parsed data directly
-      startProcessing(parsedFiles, parsedSettings)
+      
+      // Reconstruct File objects from base64
+      const reconstructedFiles: UploadedFile[] = parsedFilesData.map((fileData: StoredFileData) => {
+        // Convert base64 back to binary
+        const binaryString = atob(fileData.base64)
+        const bytes = new Uint8Array(binaryString.length)
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i)
+        }
+        const blob = new Blob([bytes], { type: fileData.type || 'image/jpeg' })
+        const file = new File([blob], fileData.originalName, { type: fileData.type || 'image/jpeg' })
+        
+        return {
+          id: fileData.id,
+          file,
+          preview: fileData.preview,
+          originalName: fileData.originalName,
+          size: fileData.size
+        }
+      })
+      
+      setUploadedFiles(reconstructedFiles)
+      // Start processing with the reconstructed files
+      startProcessing(reconstructedFiles, parsedSettings)
     } else {
       // No data found, redirect back to restore page
       navigate('/restore')

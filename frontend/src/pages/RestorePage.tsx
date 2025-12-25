@@ -76,9 +76,30 @@ export default function RestorePage() {
     })
   }
 
-  const handleProcess = () => {
+  const handleProcess = async () => {
+    // Convert File objects to base64 for storage
+    const filesWithBase64 = await Promise.all(
+      uploadedFiles.map(async (fileObj) => {
+        const arrayBuffer = await fileObj.file.arrayBuffer()
+        const bytes = new Uint8Array(arrayBuffer)
+        let binary = ''
+        for (let i = 0; i < bytes.length; i++) {
+          binary += String.fromCharCode(bytes[i])
+        }
+        const base64 = btoa(binary)
+        return {
+          id: fileObj.id,
+          base64,
+          preview: fileObj.preview,
+          originalName: fileObj.originalName,
+          size: fileObj.size,
+          type: fileObj.file.type
+        }
+      })
+    )
+    
     // Store data in sessionStorage for the processing page
-    sessionStorage.setItem('restoreFiles', JSON.stringify(uploadedFiles))
+    sessionStorage.setItem('restoreFiles', JSON.stringify(filesWithBase64))
     sessionStorage.setItem('restoreSettings', JSON.stringify(settings))
     navigate('/restore/processing')
   }
