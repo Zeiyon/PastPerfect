@@ -2,20 +2,16 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import replicate
-from io import BytesIO
-from PIL import Image
 import time
-from httpx import Timeout
 import requests
 import os
+from httpx import Timeout
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
+# Initialize FastAPI app
 app = FastAPI()
-
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,149 +20,123 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Load configuration
+IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
+REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
 
-replicate_api_token = os.getenv("REPLICATE_API_TOKEN")
-if not replicate_api_token:
-    print("WARNING: REPLICATE_API_TOKEN environment variable is not set.")
-    print("The Replicate client will try to read it from environment, but API calls may fail.")
-    print("Please set REPLICATE_API_TOKEN in your .env file or environment variables.")
+if not REPLICATE_API_TOKEN:
+    print("WARNING: REPLICATE_API_TOKEN not set. API calls may fail.")
 
-# Initialize client - it will use REPLICATE_API_TOKEN from env if api_token is not provided
+if not IMGBB_API_KEY:
+    print("WARNING: IMGBB_API_KEY not set. API calls may fail.")
+
+# Initialize Replicate client
 replicate_client = replicate.Client(
-    api_token=replicate_api_token if replicate_api_token else None,
+    api_token=REPLICATE_API_TOKEN,
     timeout=Timeout(300.0)
 )
 
-# Get imgbb API key from environment or use default
-imgbb_api_key = os.getenv("IMGBB_API_KEY", "7a6c28a2611a933130804a2663888d5a")
+# Helper functions
+def upload_to_imgbb(file_content: bytes) -> str:    
+    response = requests.post(
+        "https://api.imgbb.com/1/upload",
+        params={"key": IMGBB_API_KEY},
+        files={"image": ("image.jpg", file_content, "image/jpeg")}
+    )
+    
+    if not response.ok:
+        error_msg = f"imgbb upload failed: {response.status_code}"
+        try:
+            error_data = response.json()
+            error_msg += f" - {error_data}"
+        except:
+            error_msg += f" - {response.text}"
+        raise Exception(error_msg)
+    
+    return response.json()["data"]["url"]
 
-@app.get("/")
-async def root():
-    return {"message": "PastPerfect API is running"}
-
-def run_prediction_poll(model_or_version, input_data):
-    """Run a Replicate prediction and poll until completion
-    model_or_version can be either a model name (e.g., 'flux-kontext-apps/restore-image') 
-    or a version hash"""
-    # If it contains a slash, it's a model name; otherwise it's a version hash
-    if '/' in model_or_version:
-        prediction = replicate_client.predictions.create(
-            model=model_or_version,
-            input=input_data
-        )
-    else:
-        prediction = replicate_client.predictions.create(
-            version=model_or_version,
-            input=input_data
-        )
-    print(f"Created prediction {prediction.id}, status: {prediction.status}")
+def run_replicate_prediction(model_name: str, input_data: dict) -> str:
+    # Run Replicate prediction and poll until completion
+    prediction = replicate_client.predictions.create(
+        model=model_name,
+        input=input_data
+    )
+    print(f"Prediction {prediction.id} created, status: {prediction.status}")
     
     while prediction.status not in ["succeeded", "failed", "canceled"]:
         time.sleep(2)
         prediction = replicate_client.predictions.get(prediction.id)
-        print(f"Prediction status: {prediction.status}")
+        print(f"Status: {prediction.status}")
     
-    if prediction.status == "succeeded":
-        output = prediction.output
-        if isinstance(output, list):
-            return output[0]
-        return str(output)
-    else:
-        # Get detailed error information
-        error_msg = f"Prediction failed with status: {prediction.status}"
-        if hasattr(prediction, 'error') and prediction.error:
-            error_msg += f"\nError: {prediction.error}"
-        if hasattr(prediction, 'logs') and prediction.logs:
-            error_msg += f"\nLogs: {prediction.logs}"
-        print(f"Prediction failure details: {error_msg}")
-        raise Exception(error_msg)
+    if prediction.status != "succeeded":
+        error = getattr(prediction, 'error', 'Unknown error')
+        raise Exception(f"Prediction failed: {prediction.status}. Error: {error}")
+    
+    output = prediction.output
+    return output[0] if isinstance(output, list) else str(output)
 
-def upload_to_imgbb(file_content: bytes, imgbb_api_key: str):
-    """Upload file content to imgbb and return the URL"""
-    files = {"image": ("image.jpg", file_content, "image/jpeg")}
-    response = requests.post(
-        "https://api.imgbb.com/1/upload",
-        params={"key": imgbb_api_key},
-        files=files
-    )
-    response.raise_for_status()
-    json_data = response.json()
-    return json_data["data"]["url"]
-
-def get_next_available_filename(backend_dir):
-    """Find the next available filename in the pattern testimg_XXX.jpg"""
-    existing_files = []
-    for filename in os.listdir(backend_dir):
+def get_next_filename(directory: str) -> str:
+    # Get next available filename: testimg_001.jpg, testimg_002.jpg, etc.
+    existing = []
+    for filename in os.listdir(directory):
         if filename.startswith("testimg_") and filename.endswith(".jpg"):
             try:
-                # Extract the number from testimg_XXX.jpg
-                num_str = filename.replace("testimg_", "").replace(".jpg", "")
-                num = int(num_str)
-                existing_files.append(num)
+                num = int(filename.replace("testimg_", "").replace(".jpg", ""))
+                existing.append(num)
             except ValueError:
                 continue
     
-    # Find the next available number (handles gaps)
-    if not existing_files:
-        next_num = 1
-    else:
-        next_num = max(existing_files) + 1
-    
-    # Zero-pad to 3 digits
-    next_filename = f"testimg_{next_num:03d}.jpg"
-    return next_filename
+    next_num = max(existing) + 1 if existing else 1
+    return f"testimg_{next_num:03d}.jpg"
+
+# API endpoints
+@app.get("/")
+async def root():
+    return {"message": "PastPerfect API is running"}
 
 @app.post("/restore")
 async def restore(file: UploadFile = File(...)):
+    # Upload image, restore via Replicate, and save result
     try:
-        # Get the backend directory path
         backend_dir = os.path.dirname(os.path.abspath(__file__))
-        
-        # Read the uploaded file content
         file_content = await file.read()
         
-        # Upload image to imgbb (temporary hosting service) so Replicate can access it
-        # Replicate models need URLs, not local file paths
-        print("Uploading image to imgbb...")
-        image_url = upload_to_imgbb(file_content, imgbb_api_key)
-        print(f"Uploaded to imgbb, URL: {image_url}")
+        # Upload to imgbb (Replicate needs a URL, not local file)
+        print("Uploading to imgbb...")
+        image_url = upload_to_imgbb(file_content)
         
-        # Process through FLUX Kontext restore-image model
-        print("Starting image restoration with FLUX Kontext...")
-        restored_url = run_prediction_poll(
+        # Process through Replicate
+        print("Processing with Replicate...")
+        restored_url = run_replicate_prediction(
             "flux-kontext-apps/restore-image",
             {"input_image": image_url}
         )
-        print(f"Restoration complete, result URL: {restored_url}")
         
-        # Download the restored image
+        # Download and save restored image
         print("Downloading restored image...")
         response = requests.get(restored_url)
         response.raise_for_status()
         
-        # Find the next available filename for the result
-        next_filename = get_next_available_filename(backend_dir)
-        saved_path = os.path.join(backend_dir, next_filename)
+        filename = get_next_filename(backend_dir)
+        filepath = os.path.join(backend_dir, filename)
         
-        # Save the restored image
-        with open(saved_path, "wb") as f:
+        with open(filepath, "wb") as f:
             f.write(response.content)
-        print(f"Saved restored image to: {saved_path}")
+        
+        print(f"Saved: {filepath}")
         
         return JSONResponse(content={
             "success": True,
             "original": image_url,
             "restored": restored_url,
-            "saved_file": next_filename,
-            "saved_path": saved_path
+            "saved_file": filename,
+            "saved_path": filepath
         })
         
     except Exception as e:
         import traceback
-        error_msg = str(e)
         traceback.print_exc()
-        print(f"Error in /restore endpoint: {error_msg}")
         return JSONResponse(
             status_code=500,
-            content={"success": False, "error": error_msg}
+            content={"success": False, "error": str(e)}
         )
