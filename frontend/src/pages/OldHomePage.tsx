@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { motion, useSpring, useScroll, useMotionValue, useTransform } from "framer-motion";
+import { motion, useSpring, useScroll, useMotionValue } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import Testimonials from "../components/Testimonials";
@@ -71,47 +71,6 @@ export default function HomePage() {
   const perspectiveValue = useMotionValue(1000);
   const perspectiveContainerRef = useRef<HTMLDivElement>(null);
 
-  // Motion values for orbiting hues
-  const orbitAngle1 = useMotionValue(0);
-  const orbitAngle2 = useMotionValue(180);
-  const orbitAngle3 = useMotionValue(90);
-
-  // Transform angles to x/y positions for orbit 1 - smaller movement radius, larger orb
-  const orbit1X = useTransform(orbitAngle1, (angle) => {
-    const rad = (angle * Math.PI) / 180;
-    const radiusX = 150; // Reduced movement radius
-    return `calc(50% + ${radiusX * Math.cos(rad)}px - 800px)`;
-  });
-  const orbit1Y = useTransform(orbitAngle1, (angle) => {
-    const rad = (angle * Math.PI) / 180;
-    const radiusY = 100; // Reduced movement radius
-    return `calc(50% + ${radiusY * Math.sin(rad)}px - 800px)`;
-  });
-
-  // Transform angles to x/y positions for orbit 2 - smaller movement radius, larger orb
-  const orbit2X = useTransform(orbitAngle2, (angle) => {
-    const rad = (angle * Math.PI) / 180;
-    const radiusX = 120;
-    return `calc(50% + ${radiusX * Math.cos(rad)}px - 700px)`;
-  });
-  const orbit2Y = useTransform(orbitAngle2, (angle) => {
-    const rad = (angle * Math.PI) / 180;
-    const radiusY = 80;
-    return `calc(50% + ${radiusY * Math.sin(rad)}px - 700px)`;
-  });
-
-  // Transform angles to x/y positions for orbit 3 - smaller movement radius, larger orb
-  const orbit3X = useTransform(orbitAngle3, (angle) => {
-    const rad = (angle * Math.PI) / 180;
-    const radiusX = 180;
-    return `calc(50% + ${radiusX * Math.cos(rad)}px - 600px)`;
-  });
-  const orbit3Y = useTransform(orbitAngle3, (angle) => {
-    const rad = (angle * Math.PI) / 180;
-    const radiusY = 120;
-    return `calc(50% + ${radiusY * Math.sin(rad)}px - 600px)`;
-  });
-
   useEffect(() => {
     setIsClient(true);
     // Set initial perspective
@@ -127,7 +86,7 @@ export default function HomePage() {
       const y = scrollY.get();
 
       // Calculate scroll progress (0 to 1) from scroll position 0 to 800
-      const scrollRange = 500;
+      const scrollRange = 600;
       const progress = Math.min(y / scrollRange, 1);
 
       // Interpolate rotations: start looking up at user, end straight
@@ -168,48 +127,8 @@ export default function HomePage() {
     sequence();
   }, [springPosition, isClient]);
 
-  // Animate orbiting hues
-  useEffect(() => {
-    if (!isClient) return;
-
-    const animateOrbits = () => {
-      const startTime = Date.now();
-      
-      const update = () => {
-        const elapsed = (Date.now() - startTime) / 1000;
-        
-        // Orbit 1: 35 second rotation (slower)
-        orbitAngle1.set((elapsed * 360 / 35) % 360);
-        
-        // Orbit 2: 40 second rotation (slower, opposite direction)
-        orbitAngle2.set((180 - (elapsed * 360 / 40)) % 360);
-        
-        // Orbit 3: 45 second rotation (slower)
-        orbitAngle3.set((90 + (elapsed * 360 / 45)) % 360);
-        
-        requestAnimationFrame(update);
-      };
-      
-      update();
-    };
-
-    animateOrbits();
-  }, [isClient, orbitAngle1, orbitAngle2, orbitAngle3]);
-
   return (
     <div className="relative home-page">
-      {/* Background Pattern for entire page */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          backgroundImage: `
-            // radial-gradient(circle at 2px 2px, rgba(148, 163, 184, 0.1) 1.5px, transparent 0),
-            // radial-gradient(circle at 30px 30px, rgba(148, 163, 184, 0.2) 1.5px, transparent 0)
-          `,
-          backgroundSize: "60px 60px, 60px 60px",
-          backgroundPosition: "0 0, 0 0",
-        }}
-      />
       <div className="space-y-8 sm:space-y-12 md:space-y-16 lg:space-y-24 pb-8 sm:pb-12 md:pb-16 lg:pb-24 pt-8 sm:pt-12 md:pt-16 lg:pt-24 relative z-10">
         <motion.section
           initial={{ scale: 0.98, opacity: 0, y: 20 }}
@@ -223,69 +142,20 @@ export default function HomePage() {
             background:
               "linear-gradient(to bottom, #fff 0%, #f1f5f9 35%, #f1f5f9 100%)",
           }}
-          className="hero-background flex flex-col items-center justify-center pt-12 sm:pt-16 md:pt-18 lg:pt-20 pb-12 sm:pb-14 md:pb-16 lg:pb-20 px-4 min-h-[50vh] md:min-h-[70vh] relative mb-0 overflow-hidden"
+          className="hero-background flex flex-col items-center justify-center pt-16 sm:pt-20 md:pt-24 lg:pt-32 pb-12 sm:pb-14 md:pb-16 lg:pb-20 px-4 min-h-[50vh] md:min-h-[70vh] relative mb-0 overflow-hidden"
         >
           {/* Subtle Background Pattern with smooth fade */}
-          {/* <div
+          <div
             className="absolute inset-0 pointer-events-none z-0"
             style={{
               backgroundImage: `
-                radial-gradient(circle at 5px 5px, rgba(148, 163, 184, 0.1) 4px, transparent 0),
-                radial-gradient(circle at 10px 10px, rgba(148, 163, 184, 0.1) 4px, transparent 0)
+                radial-gradient(circle at 2px 2px, rgba(148, 163, 184, 0.1) 2.5px, transparent 0),
+                radial-gradient(circle at 30px 30px, rgba(148, 163, 184, 0.10) 2px, transparent 0)
               `,
               backgroundSize: "60px 60px, 60px 60px",
               backgroundPosition: "0 0, 0 0",
             }}
-          /> */}
-          
-          {/* Orbiting Glowing Hues - Larger, centered, theme-matched, subtle movement */}
-          <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-            {/* Primary orbiting hue - warm orange/amber (matches brand) */}
-            <motion.div
-              className="absolute"
-              style={{
-                width: "1600px",
-                height: "1600px",
-                background: "radial-gradient(circle, rgba(251, 146, 60, 0.12) 0%, rgba(249, 115, 22, 0.08) 30%, rgba(251, 146, 60, 0.04) 50%, transparent 70%)",
-                borderRadius: "50%",
-                filter: "blur(100px)",
-                x: orbit1X,
-                y: orbit1Y,
-                mixBlendMode: "multiply",
-              }}
-            />
-            
-            {/* Secondary orbiting hue - soft slate/blue (matches site theme) */}
-            <motion.div
-              className="absolute"
-              style={{
-                width: "1400px",
-                height: "1400px",
-                background: "radial-gradient(circle, rgba(100, 116, 139, 0.1) 0%, rgba(71, 85, 105, 0.06) 30%, rgba(100, 116, 139, 0.03) 50%, transparent 70%)",
-                borderRadius: "50%",
-                filter: "blur(90px)",
-                x: orbit2X,
-                y: orbit2Y,
-                mixBlendMode: "multiply",
-              }}
-            />
-            
-            {/* Tertiary orbiting hue - warm amber accent */}
-            <motion.div
-              className="absolute"
-              style={{
-                width: "1200px",
-                height: "1200px",
-                background: "radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, rgba(251, 146, 60, 0.06) 30%, rgba(245, 158, 11, 0.03) 50%, transparent 70%)",
-                borderRadius: "50%",
-                filter: "blur(80px)",
-                x: orbit3X,
-                y: orbit3Y,
-                mixBlendMode: "multiply",
-              }}
-            />
-          </div>
-          
+          />
           {/* Smooth fade overlay */}
           <div
             className="absolute inset-0 pointer-events-none z-0"
@@ -301,34 +171,46 @@ export default function HomePage() {
               delay: 0.3,
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
-            className="relative z-10 text-3xl sm:text-4xl md:text-5xl lg:text-4xl xl:text-7xl font-extrabold text-slate-900 mb-2 sm:mb-4 md:mb-6 lg:mb-8 text-center leading-tight tracking-tight drop-shadow-lg px-4 flex items-center justify-center"
+            className="relative z-10 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-slate-900 mb-4 sm:mb-6 md:mb-8 lg:mb-10 text-center leading-tight tracking-tight drop-shadow-lg px-4"
           >
-            <span className="whitespace-nowrap mr-3">Reimagine your</span>
-            <span 
-              className="text-orange-500 font-extrabold ml-2 inline-block text-left w-[200px] sm:w-[250px] md:w-[280px] lg:w-[300px] xl:w-[350px]" 
-              style={{ 
-                letterSpacing: "0.05em"
-              }}
-            >
-              <TypeAnimation
-                sequence={[
-                  "Memories",
-                  2000,
-                  "Photos",
-                  1000,
-                  "Family",
-                  1000,
-                  "Partner",
-                  1000,
-                ]}
-                wrapper="span"
-                speed={50}
-                repeat={Infinity}
-                preRenderFirstString={true}
-                cursor={true}
-              />
-            </span>
+            Reimagine your
           </motion.h1>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.8,
+              delay: 0.5,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
+            className="relative z-10 flex items-center justify-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 text-center px-4"
+          >
+            <span
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-center tracking-wide"
+              style={{ letterSpacing: "0.05em" }}
+            >
+              <span className="ml-1 sm:ml-2 md:ml-4 lg:ml-8 text-orange-500 font-extrabold">
+                <TypeAnimation
+                  sequence={[
+                    "Memories",
+                    2000,
+                    "Photos",
+                    1000,
+                    "Family",
+                    1000,
+                    "Loved Ones",
+                    1000,
+                  ]}
+                  wrapper="span"
+                  speed={50}
+                  repeat={Infinity}
+                  preRenderFirstString={true}
+                  cursor={true}
+                />
+              </span>
+            </span>
+          </motion.div>
 
           <motion.p
             initial={{ opacity: 0, y: 30 }}
@@ -338,9 +220,10 @@ export default function HomePage() {
               delay: 0.7,
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
-            className="relative z-10 text-base sm:text-lg md:text-xl lg:text-2xl text-slate-700 mb-8 sm:mb-10 md:mb-12 lg:mb-12 max-w-2xl sm:max-w-3xl text-center font-normal px-4"
+            className="relative z-10 text-base sm:text-lg md:text-xl lg:text-2xl text-slate-700 mb-8 sm:mb-10 md:mb-12 lg:mb-16 max-w-2xl sm:max-w-3xl text-center font-medium px-4"
           >
-            All with just a Click of a Button.
+            Restore, enhance, and relive your most precious moments with
+            stunning clarity. Fast, secure, and just a tap away.
           </motion.p>
 
           <motion.button
@@ -356,7 +239,7 @@ export default function HomePage() {
               transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] },
             }}
             whileTap={{ scale: 0.98 }}
-            className="relative z-10 cursor-pointer px-4 sm:px-6 md:px-8 py-3 md:py-3 rounded-xl font-bold text-sm sm:text-base md:text-lg shadow-md bg-orange-600 text-white border border-orange-700 overflow-hidden mb-4 sm:mb-6 md:mb-8 lg:mb-6 sheen-btn transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-orange-300 hover:bg-orange-600"
+            className="relative z-10 cursor-pointer px-4 sm:px-6 md:px-8 py-3 md:py-3 rounded-xl font-bold text-sm sm:text-base md:text-lg shadow-md bg-orange-600 text-white border border-orange-700 overflow-hidden mb-4 sm:mb-6 md:mb-8 lg:mb-12 sheen-btn transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-orange-300 hover:bg-orange-600"
             type="button"
             onClick={() => navigate("/restore")}
           >
@@ -366,7 +249,7 @@ export default function HomePage() {
           {/* Optimized Animated Slider Wrapper */}
           <div 
             ref={perspectiveContainerRef}
-            className="relative z-10 w-full max-w-[90vw] xl:max-w-[1200px] 2xl:max-w-[1400px] mx-auto px-2 sm:px-4"
+            className="relative z-10 w-full max-w-[95vw] xl:max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-2 sm:px-4"
             style={{
               transformStyle: "preserve-3d",
             }}
@@ -382,9 +265,9 @@ export default function HomePage() {
                 transformStyle: "preserve-3d",
                 willChange: "transform",
               }}
-              className="bg-white rounded-2xl md:rounded-3xl shadow-xl md:shadow-2xl shadow-slate-900/15 flex items-center justify-center w-full h-[350px] sm:h-[450px] md:h-[580px] lg:h-[800px] xl:h-[900px] p-2 slider-glow"
+              className="bg-white rounded-2xl md:rounded-3xl shadow-xl md:shadow-2xl shadow-slate-900/15 flex items-center justify-center w-full h-[400px] sm:h-[500px] md:h-[650px] lg:h-[900px] xl:h-[1000px] p-2 slider-glow"
             >
-              <div className="relative w-full h-[330px] sm:h-[430px] md:h-[560px] lg:h-[780px] xl:h-[880px] rounded-xl overflow-hidden">
+              <div className="relative w-full h-[380px] sm:h-[480px] md:h-[630px] lg:h-[880px] xl:h-[980px] rounded-xl overflow-hidden">
                 <ReactCompareSlider
                   itemOne={
                     <ReactCompareSliderImage

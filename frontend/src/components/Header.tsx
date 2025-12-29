@@ -53,7 +53,7 @@ export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
             >
               Home
             </Link>
-            <Link 
+            {/* <Link 
               to="/restore" 
               className={`text-base font-semibold transition-colors ${
                 location.pathname === '/restore' 
@@ -62,9 +62,9 @@ export default function Header({ onLoginClick, onSignUpClick }: HeaderProps) {
               }`}
             >
               Restore
-            </Link>
+            </Link> */}
             <Link 
-              to="/upscale" 
+              to="/restore" 
               className={`text-base font-semibold transition-colors ${
                 location.pathname === '/upscale' 
                   ? 'text-orange-600' 

@@ -139,23 +139,23 @@ export default function PricingPage() {
       <div className="relative z-10 w-full flex flex-col items-center">
         
         {/* Hero Section */}
-        <motion.section 
-          className="w-full max-w-4xl mx-auto text-center pt-32 pb-16 px-4"
-          initial="hidden"
-          animate="visible"
-          variants={fadeInUp}
+        {/* Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8 pt-32 px-4"
         >
-          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 text-center leading-tight tracking-tight drop-shadow-lg">
-            Find the perfect plan for you
+          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 text-center leading-tight tracking-tight drop-shadow-lg">
+           Find the Perfect Plan for You
           </h1>
-          <p className="text-xl md:text-xl text-slate-700 mb-4 max-w-3xl text-center font-medium mx-auto">
+          <p className="text-xl md:text-xl text-slate-700 mb-6 max-w-3xl text-center font-medium mx-auto">
             No credit card required to sign up, cancel anytime.
           </p>
-        </motion.section>
+        </motion.div>
 
         {/* Pricing Cards */}
         <motion.section 
-          className="w-full max-w-6xl mx-auto px-4 mb-16"
+          className="w-full max-w-6xl mx-auto px-4 mb-12"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
@@ -165,7 +165,7 @@ export default function PricingPage() {
               <motion.div
                 key={plan.name}
                 variants={itemVariants}
-                className={`relative flex flex-col rounded-3xl shadow-xl p-8 border bg-gradient-to-br from-white via-slate-50 to-slate-100 transition-all duration-300 group hover:shadow-2xl hover:-translate-y-1 ${
+                className={`relative flex flex-col rounded-3xl shadow-xl p-7 border bg-gradient-to-br from-white via-slate-50 to-slate-100 transition-all duration-300 group hover:shadow-2xl hover:-translate-y-1 ${
                   plan.highlight
                     ? "scale-105 border-orange-300 bg-gradient-to-br from-orange-50/90 via-white to-orange-100 z-10 ring-2 ring-orange-200"
                     : "border-slate-100"
@@ -181,16 +181,16 @@ export default function PricingPage() {
                     <span className="text-lg text-slate-400 ml-1">{plan.period}</span>
                   </div>
                 </div>
-                <ul className="text-left space-y-3 mb-8 mt-4 max-w-xs mx-auto">
+                <ul className="text-left space-y-2.5 mb-7 mt-4 max-w-xs mx-auto">
                   {plan.features.map((f, j) => (
                     <li key={j} className="flex items-center text-slate-700 text-base md:text-lg">
-                      <CheckCircle className={`w-5 h-5 mr-2 ${plan.highlight ? 'text-orange-400' : 'text-slate-300'}`} /> {f}
+                      <CheckCircle className={`w-5 h-5 mr-2 flex-shrink-0 ${plan.highlight ? 'text-orange-400' : 'text-slate-300'}`} /> {f}
                     </li>
                   ))}
                 </ul>
                 <button className={`mt-auto w-full py-3 rounded-xl font-bold text-lg shadow transition-transform sheen focus:outline-none focus:ring-2 focus:ring-orange-400 ${plan.highlight ? "bg-gradient-to-r from-orange-400 to-orange-600 text-white hover:from-orange-500 hover:to-orange-700" : "bg-slate-200 text-slate-700 hover:bg-slate-300"}`}>{plan.cta}</button>
                 {plan.note && (
-                  <div className="text-xs mt-5 text-slate-400 text-center font-medium italic">
+                  <div className="text-xs mt-4 text-slate-400 text-center font-medium italic">
                     {plan.note}
                   </div>
                 )}
@@ -201,17 +201,17 @@ export default function PricingPage() {
 
         {/* Mail-in Photo Restoration Service Section */}
         <motion.section 
-          className="w-full max-w-7xl mx-auto px-4 mb-16 mt-8"
+          className="w-full max-w-7xl mx-auto px-4 mb-12 mt-6"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
           <motion.div 
-            className="text-center mb-12"
+            className="text-center mb-8"
             variants={itemVariants}
           >
             <span className="text-xs font-semibold text-orange-500 uppercase tracking-wide">MAIL-IN SERVICE</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-00 mb-6 text-center drop-shadow-sm">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 text-center drop-shadow-sm">
               Mail us your photos
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
